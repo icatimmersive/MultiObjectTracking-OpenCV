@@ -16,4 +16,5 @@ private:
     std::string blobWinTitle;
     cv::UMat buffer;
     cv::UMat rgbMaskImage;
+    cv::Point mousePos;
 };

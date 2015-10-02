@@ -20,8 +20,8 @@ int main(int argc, char *argv[]) {
     if(argc == 1) {
         // Defaults
         id = 0;
-//         url = "../walk.mov";
-        url = "http://admin:admin@192.168.1.14/video.cgi?.mjpg";
+         url = "../walk-cut.mov";
+//         url = "http://admin:admin@192.168.1.14/video.cgi?.mjpg";
     } else if(argc != 3 || (argc == 2 && std::string(argv[1]) == "--help")) {
         printUsage(argv[0]);
         return 0;
