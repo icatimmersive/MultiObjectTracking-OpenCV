@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <string>
 #include <iostream>
 #include <unistd.h>
@@ -21,12 +22,15 @@ int main(int argc, char *argv[]) {
         // Defaults
         id = 0;
          url = "../walk-cut.mov";
-//         url = "http://admin:admin@192.168.1.14/video.cgi?.mjpg";
+//          url = "http://admin:admin@192.168.1.15/video.cgi?.mjpg";
     } else if(argc != 3 || (argc == 2 && std::string(argv[1]) == "--help")) {
         printUsage(argv[0]);
         return 0;
+    } else {
+        id = std::atoi(argv[1]);
+        url = argv[2];
     }
-
+    
     // Initialize system objects
     Camera camera(id, url);
     Display display(id);
