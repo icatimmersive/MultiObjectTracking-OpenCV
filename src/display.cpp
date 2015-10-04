@@ -2,8 +2,10 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <iomanip>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/core/utility.hpp>
 
 const cv::Scalar maskColor(0, 0, 255); // red
 const cv::Scalar bboxColor(0, 255, 0, 127); // green
@@ -14,8 +16,41 @@ const cv::HersheyFonts labelFont = cv::HersheyFonts::FONT_HERSHEY_SIMPLEX;
 const double labelScale = 0.4;
 const int labelFontThickness = 1;
 const int labelPad = 3;
+const cv::Scalar fpsColor(255, 255, 255); // white
 
-void drawTracks(cv::UMat& image, const Tracks& tracks, cv::Point& mousePos) {
+// FPS
+
+Display::FPS::FPS(int size) : prevTick(0), size(size), index(0), sum(0), filled(false) {
+    ticks = new std::int64_t[size];
+    std::fill(ticks, ticks + size, 0);
+}
+
+Display::FPS::~FPS() {
+    delete ticks;
+}
+
+void Display::FPS::update(std::int64_t newTick) {
+    if(prevTick == 0) {
+        prevTick = newTick;
+        return;
+    } else if(!filled && index == size - 1) {
+        filled = true;
+    }
+    std::int64_t tickDiff = newTick - prevTick;
+    prevTick = newTick;
+    sum -= ticks[index];
+    sum += tickDiff;
+    ticks[index] = tickDiff;
+    index = (index == size - 1 ? 0 : index + 1);
+}
+
+// Display
+
+double Display::FPS::getFPS() {
+    return (filled ? cv::getTickFrequency() / (sum * 1.0 / size) : 0.0);
+}
+
+void drawTracks(cv::UMat& image, const Tracks& tracks, cv::Point& mousePos, double fps) {
     for(const std::unique_ptr<Track>& track : tracks) {
         // Draw contour outline
         const Contour& contour = track->getContour();
@@ -24,7 +59,7 @@ void drawTracks(cv::UMat& image, const Tracks& tracks, cv::Point& mousePos) {
         const cv::Rect& bbox = track->getBBox();
         if(bbox.contains(mousePos)) {
             cv::UMat roi = image(bbox);
-            cv::UMat bboxFill(roi.rows, roi.cols, roi.type(), {0, 0, 0});
+            cv::UMat bboxFill(roi.rows, roi.cols, roi.type(), {255, 255, 255});
             cv::addWeighted(bboxFill, 0.5, roi, 0.5, 0.0, roi);
         }
         cv::rectangle(image, bbox.tl(), bbox.br(), bboxColor);
@@ -43,6 +78,10 @@ void drawTracks(cv::UMat& image, const Tracks& tracks, cv::Point& mousePos) {
         cv::Point labelPos(bbox.x + labelPad, bbox.y - labelPad - 1);
         cv::putText(image, labelText, labelPos, labelFont, labelScale, labelColor, labelFontThickness);
     }
+    // Draw FPS text
+    std::ostringstream fpsTextStream;
+    fpsTextStream << "FPS: " << std::fixed << std::setprecision(2) << fps;
+    cv::putText(image, fpsTextStream.str(), {0, image.rows - 8}, labelFont, labelScale, fpsColor);
 }
 
 void mouseCallback(int event, int x, int y, int flags, void* data) {
@@ -54,7 +93,7 @@ void mouseCallback(int event, int x, int y, int flags, void* data) {
     point.y = y;
 }
 
-Display::Display(int cameraId) {
+Display::Display(int cameraId) : fps(100) {
     // Initialize windows
     imageWinTitle = "Camera " + std::to_string(cameraId);
     blobWinTitle = imageWinTitle + " Blobs";
@@ -70,6 +109,9 @@ Display::~Display() {
 }
 
 void Display::showFrame(cv::UMat& frame, cv::UMat& maskImage, const Tracks& tracks) {
+    // Calculate FPS
+    fps.update(cv::getTickCount());
+    double fpsValue = fps.getFPS();
     // Move windows to be side by side
     cv::moveWindow(imageWinTitle, 0, 0);
     cv::moveWindow(blobWinTitle, frame.cols, 0);
@@ -77,12 +119,12 @@ void Display::showFrame(cv::UMat& frame, cv::UMat& maskImage, const Tracks& trac
     cv::cvtColor(maskImage, rgbMaskImage, cv::COLOR_GRAY2BGR);
     // Display just the blob and track information
     cv::UMat blobImage = rgbMaskImage.clone();
-    drawTracks(blobImage, tracks, mousePos);
+    drawTracks(blobImage, tracks, mousePos, fpsValue);
     cv::imshow(blobWinTitle, blobImage);
     // Color the mask so it shows up better when overlaid
     rgbMaskImage.setTo(maskColor, maskImage);
     // Add the colored mask image as a semi-transparent overlay to the camera image
     cv::addWeighted(frame, 1.0, rgbMaskImage, 0.65, 0.0, buffer);
-    drawTracks(buffer, tracks, mousePos);
+    drawTracks(buffer, tracks, mousePos, fpsValue);
     cv::imshow(imageWinTitle, buffer);
 }
