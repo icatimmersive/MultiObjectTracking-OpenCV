@@ -22,8 +22,9 @@ bool contourFilter(Contour& contour) {
 DifferenceTracker::DifferenceTracker() {
     // Initialize difference engine and blob detector
     // Parameters taken from original MATLAB code
-    diffEngine = cv::bgsegm::createBackgroundSubtractorMOG(100, 5, 0.15);
-//     diffEngine = cv::createBackgroundSubtractorKNN();
+    diffEngine = cv::bgsegm::createBackgroundSubtractorMOG(100, 2, 0.01);
+//     diffEngine = cv::createBackgroundSubtractorKNN(1000, 400.0, false);
+//     diffEngine = cv::createBackgroundSubtractorMOG2(1000, 400.0, false);
 }
 
 DifferenceTracker::~DifferenceTracker() {
