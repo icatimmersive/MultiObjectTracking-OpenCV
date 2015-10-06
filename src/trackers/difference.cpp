@@ -47,8 +47,7 @@ void DifferenceTracker::processFrame(cv::UMat& frame) {
         if(!contourFilter(contour)) {
             continue;
         }
-        cv::Rect bbox = cv::boundingRect(contour);
-        std::unique_ptr<Track> track(new Track(i, bbox, contour));
+        std::unique_ptr<Track> track(new Track(i, contour));
         tracks.push_back(std::move(track));
         i++;
     }

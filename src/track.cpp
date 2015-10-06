@@ -1,6 +1,16 @@
 #include "track.h"
+#include <cmath>
+#include <opencv2/imgproc.hpp>
 
-Track::Track(int id, cv::Rect& bbox, Contour& contour) : id(id), bbox(bbox), contour(contour) {
+cv::Point calcCentroid(Contour& contour) {
+    cv::Moments moments = cv::moments(contour);
+    double xc = moments.m10 / moments.m00;
+    double yc = moments.m01 / moments.m00;
+    return {(int)std::round(xc), (int)std::round(yc)};
+}
+
+Track::Track(int id, Contour& contour) : id(id) {
+    update(contour);
 }
 
 int Track::getId() {
@@ -11,14 +21,18 @@ const cv::Rect& Track::getBBox() {
     return bbox;
 }
 
-void Track::setBBox(cv::Rect& new_bbox) {
-    bbox = new_bbox;
-}
-
 const Contour& Track::getContour() {
     return contour;
 }
 
-void Track::setContour(Contour& new_contour) {
+const Prediction& Track::getPrediction() {
+    return prediction;
+}
+
+void Track::update(Contour& new_contour) {
     contour = new_contour;
+    bbox = cv::boundingRect(contour);
+    cv::Point center = calcCentroid(contour);
+    // TODO use Kalman filter
+    prediction = center;
 }
