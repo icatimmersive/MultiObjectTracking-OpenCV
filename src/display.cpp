@@ -11,6 +11,8 @@ const cv::Scalar maskColor(0, 0, 255); // red
 const cv::Scalar bboxColor(0, 255, 0, 127); // green
 const cv::Scalar contourColor(0, 255, 255, 127); // yellow
 const int contourThickness = 2;
+const cv::Scalar predictionColor(255, 0, 0); // blue
+const int predictionSize = 3;
 const cv::Scalar labelColor(0, 0, 0); // black
 const cv::HersheyFonts labelFont = cv::HersheyFonts::FONT_HERSHEY_SIMPLEX;
 const double labelScale = 0.4;
@@ -63,6 +65,8 @@ void drawTracks(cv::UMat& image, const Tracks& tracks, cv::Point& mousePos, doub
             cv::addWeighted(bboxFill, 0.5, roi, 0.5, 0.0, roi);
         }
         cv::rectangle(image, bbox.tl(), bbox.br(), bboxColor);
+        // Draw current prediction
+        cv::circle(image, track->getPrediction(), predictionSize, predictionColor, -1);
         // Annotate bounding box with track information
         std::ostringstream labelTextStream;
         labelTextStream << "Blob " << track->getId() << " (Area: " << cv::contourArea(contour) << ")";
