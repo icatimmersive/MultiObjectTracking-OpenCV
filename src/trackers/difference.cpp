@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
-#include <opencv2/bgsegm.hpp>
+#include <opencv2/video.hpp>
 
 const double contourMinArea = 400.0;
 
@@ -22,9 +22,9 @@ bool contourFilter(Contour& contour) {
 DifferenceTracker::DifferenceTracker() {
     // Initialize difference engine and blob detector
     // Parameters taken from original MATLAB code
-    diffEngine = cv::bgsegm::createBackgroundSubtractorMOG(100, 2, 0.01);
+//     diffEngine = cv::bgsegm::createBackgroundSubtractorMOG(100, 2, 0.01); // requires contrib module "bgsegm"
 //     diffEngine = cv::createBackgroundSubtractorKNN(1000, 400.0, false);
-//     diffEngine = cv::createBackgroundSubtractorMOG2(1000, 400.0, false);
+    diffEngine = cv::createBackgroundSubtractorMOG2(100, 400.0, false);
 }
 
 DifferenceTracker::~DifferenceTracker() {
