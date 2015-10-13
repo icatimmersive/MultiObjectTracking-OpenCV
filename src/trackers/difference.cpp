@@ -14,9 +14,10 @@ void smoothMask(cv::UMat& maskImage) {
     cv::morphologyEx(maskImage, maskImage, cv::MorphTypes::MORPH_CLOSE, kernel);
 }
 
+// Returns true if the contour should be removed (does not pass the filter)
 bool contourFilter(Contour& contour) {
     double contourArea = cv::contourArea(contour);
-    return contourArea >= contourMinArea;
+    return contourArea < contourMinArea;
 }
 
 DifferenceTracker::DifferenceTracker() {
@@ -40,15 +41,6 @@ void DifferenceTracker::processFrame(cv::UMat& frame) {
     std::vector<Contour> contours;
     // RETR_EXTENRAL = find outermost contours, CHAIN_APPROX_SIMPLE = approximate lines to reduce number of points
     cv::findContours(maskImageCopy, contours, cv::RetrievalModes::RETR_EXTERNAL, cv::ContourApproximationModes::CHAIN_APPROX_SIMPLE);
-    // For now (testing), destroy all track objects each time
-    tracks.clear();
-    int i = 0;
-    for(Contour contour : contours) {
-        if(!contourFilter(contour)) {
-            continue;
-        }
-        std::unique_ptr<Track> track(new Track(i, contour));
-        tracks.push_back(std::move(track));
-        i++;
-    }
+    contours.erase(std::remove_if(contours.begin(), contours.end(), contourFilter), contours.end());
+    Track::assignTracks(tracks, contours);
 }

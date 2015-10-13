@@ -9,6 +9,33 @@ cv::Point calcCentroid(Contour& contour) {
     return {(int)std::round(xc), (int)std::round(yc)};
 }
 
+double getAssignCost(std::unique_ptr<Track>& track, Contour& contour) {
+    TrackingData data = calcCentroid(contour);
+    const TrackingData& prediction = track->getPrediction();
+    return sqrt(pow(data.x - prediction.x, 2) + pow(data.y - prediction.y, 2));
+}
+
+void Track::assignTracks(Tracks& tracks, std::vector<Contour>& contours) {
+    // TODO Implement Munkres/Hungarian algorithm to solve
+    // the cost assignment problem in O(n^3) rather t
+    for(std::unique_ptr<Track>& track : tracks) {
+        double minCost = costNonassignment;
+        int minIndex = -1;
+        for(int i = 0; i < contours.size(); i++) {
+            double cost = getAssignCost(track, contours[i]);
+            if(cost < minCost) {
+                minCost = cost;
+                minIndex = i;
+            }
+        }
+        if(minIndex == -1) {
+            continue;
+        }
+        contours.erase(contours.begin() + minIndex);
+        track->update(contours[minIndex]);
+    }
+}
+
 Track::Track(int id, Contour& contour) : id(id) {
     update(contour);
 }

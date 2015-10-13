@@ -5,11 +5,16 @@
 #include <opencv2/core.hpp>
 #include <opencv2/video/tracking.hpp>
 
+class Track;
 typedef cv::Point TrackingData;
 typedef std::vector<cv::Point> Contour;
+typedef std::vector<std::unique_ptr<Track>> Tracks;
 
 class Track {
 public:
+    static const int costNonassignment = 20;
+    // Will modify the contour vector - whatever remains was not assigned to a track
+    static void assignTracks(Tracks& tracks, std::vector<Contour>& contours);
     Track(int id, Contour& contour);
 
     int getId();
@@ -25,5 +30,3 @@ private:
     TrackingData prediction;
     cv::KalmanFilter kalman;
 };
-
-typedef std::vector<std::unique_ptr<Track>> Tracks;
