@@ -5,8 +5,8 @@
 #include <opencv2/core.hpp>
 #include <opencv2/video/tracking.hpp>
 
+typedef cv::Point TrackingData;
 typedef std::vector<cv::Point> Contour;
-typedef cv::Point Prediction;
 
 class Track {
 public:
@@ -15,14 +15,14 @@ public:
     int getId();
     const cv::Rect& getBBox();
     const Contour& getContour();
-    const cv::Point& getPrediction();
+    const TrackingData& getPrediction();
     void update(Contour& new_contour);
 
 private:
     int id;
     cv::Rect bbox;
     Contour contour;
-    Prediction prediction;
+    TrackingData prediction;
     cv::KalmanFilter kalman;
 };
 

@@ -25,7 +25,7 @@ const Contour& Track::getContour() {
     return contour;
 }
 
-const Prediction& Track::getPrediction() {
+const TrackingData& Track::getPrediction() {
     return prediction;
 }
 
