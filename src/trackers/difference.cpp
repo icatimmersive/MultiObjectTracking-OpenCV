@@ -5,6 +5,7 @@
 #include <functional>
 #include <opencv2/video.hpp>
 
+const int skipFrames = 5;
 const double contourMinArea = 400.0;
 
 void smoothMask(cv::UMat& maskImage) {
@@ -21,7 +22,7 @@ bool contourFilter(Contour& contour) {
     return contourArea >= contourMinArea;
 }
 
-DifferenceTracker::DifferenceTracker() {
+DifferenceTracker::DifferenceTracker() : skipped(0) {
     // Initialize difference engine and blob detector
     // Parameters taken from original MATLAB code
 //     diffEngine = cv::bgsegm::createBackgroundSubtractorMOG(100, 2, 0.01); // requires contrib module "bgsegm"
@@ -37,6 +38,11 @@ void DifferenceTracker::processFrame(cv::UMat& frame) {
     diffEngine->apply(frame, maskImage, 0.0);
     // Apply operations to improve mask image
     smoothMask(maskImage);
+    // Now return if this frame should be skipped
+    if(skipped < skipFrames) {
+        skipped++;
+        return;
+    }
     // Make a copy of the mask because findContours will modify it
     cv::UMat maskImageCopy = maskImage.clone();
     std::vector<Contour> contours;
