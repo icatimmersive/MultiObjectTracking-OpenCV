@@ -26,7 +26,7 @@ Display::FPS::FPS(int size) : prevTick(0), size(size), index(0), sum(0), filled(
 }
 
 Display::FPS::~FPS() {
-    delete ticks;
+    delete[] ticks;
 }
 
 void Display::FPS::update(std::int64_t newTick) {
