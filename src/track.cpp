@@ -2,6 +2,8 @@
 #include <cmath>
 #include <opencv2/imgproc.hpp>
 
+size_t Track::instances = 0;
+
 cv::Point calcCentroid(Contour& contour) {
     cv::Moments moments = cv::moments(contour);
     double xc = moments.m10 / moments.m00;
@@ -32,13 +34,18 @@ void Track::assignTracks(Tracks& tracks, std::vector<Contour>& contours) {
             // No contour found, so track becomes invisible
             track->update();
         } else {
-            contours.erase(contours.begin() + minIndex);
             track->update(contours[minIndex]);
+            contours.erase(contours.begin() + minIndex);
         }
     }
 }
 
-Track::Track(int id, Contour& contour) : id(id) {
+size_t Track::getNextIndex() {
+    return instances + 1;
+}
+
+Track::Track(Contour& contour, int id) : id(id) {
+    instances++;
     update(contour);
 }
 

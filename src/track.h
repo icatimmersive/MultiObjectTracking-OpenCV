@@ -12,10 +12,12 @@ typedef std::vector<std::unique_ptr<Track>> Tracks;
 
 class Track {
 public:
-    static const int costNonassignment = 20;
+    static const int costNonassignment = 40;
     // Will modify the contour vector - whatever remains was not assigned to a track
     static void assignTracks(Tracks& tracks, std::vector<Contour>& contours);
-    Track(int id, Contour& contour);
+    static size_t getNextIndex();
+
+    Track(Contour& contour, int id = getNextIndex());
 
     int getId();
     int getAge();
@@ -31,6 +33,8 @@ public:
     void update(Contour& new_contour);
 
 private:
+    static size_t instances;
+
     int id;
     int age;
     int visibleCount;
