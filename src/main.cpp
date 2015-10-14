@@ -1,7 +1,6 @@
 #include <cstdlib>
 #include <string>
 #include <iostream>
-#include <unistd.h>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include "camera.h"
@@ -37,14 +36,18 @@ int main(int argc, char *argv[]) {
     ObjectTracker* tracker = new DifferenceTracker();
 
     // Start video processing
-    cv::UMat frame;
-    while(camera.getVideo().read(frame)) {
-        tracker->processFrame(frame);
-        display.showFrame(frame, tracker->getMaskImage(), tracker->getTracks());
-        // Only the least-signficant byte is used, sometimes the rest is garbage so 0xFF is needed
-        int key = cv::waitKey(10) & 0xFF;
-        if(key == 27) { // Escape pressed
-            break;
+    try {
+        cv::UMat frame;
+        while(camera.getVideo().read(frame)) {
+            tracker->processFrame(frame);
+            display.showFrame(frame, tracker->getMaskImage(), tracker->getTracks());
+            // Only the least-signficant byte is used, sometimes the rest is garbage so 0xFF is needed
+            int key = cv::waitKey(10) & 0xFF;
+            if(key == 27) { // Escape pressed
+                break;
+            }
         }
+    } catch(const std::exception& ex) {
+        std::cerr << "Error occurred: " << ex.what() << std::endl;
     }
 }
