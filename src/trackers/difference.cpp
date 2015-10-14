@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <functional>
 #include <opencv2/video.hpp>
 
 const double contourMinArea = 400.0;
@@ -10,14 +11,14 @@ void smoothMask(cv::UMat& maskImage) {
     // Median filter for smoothing
     cv::medianBlur(maskImage, maskImage, 3); // MATLAB code uses medfilt2, which uses 3x3 aperture
     // Morphological operations to remove noise and fill in holes
-    cv::Mat kernel = cv::getStructuringElement(cv::MorphShapes::MORPH_ELLIPSE, cv::Size(10, 8));
+    cv::Mat kernel = cv::getStructuringElement(cv::MorphShapes::MORPH_ELLIPSE, cv::Size(14, 14));
     cv::morphologyEx(maskImage, maskImage, cv::MorphTypes::MORPH_CLOSE, kernel);
 }
 
-// Returns true if the contour should be removed (does not pass the filter)
+// Returns true if the contour is usable
 bool contourFilter(Contour& contour) {
     double contourArea = cv::contourArea(contour);
-    return contourArea < contourMinArea;
+    return contourArea >= contourMinArea;
 }
 
 DifferenceTracker::DifferenceTracker() {
@@ -41,6 +42,6 @@ void DifferenceTracker::processFrame(cv::UMat& frame) {
     std::vector<Contour> contours;
     // RETR_EXTENRAL = find outermost contours, CHAIN_APPROX_SIMPLE = approximate lines to reduce number of points
     cv::findContours(maskImageCopy, contours, cv::RetrievalModes::RETR_EXTERNAL, cv::ContourApproximationModes::CHAIN_APPROX_SIMPLE);
-    contours.erase(std::remove_if(contours.begin(), contours.end(), contourFilter), contours.end());
+    contours.erase(std::remove_if(contours.begin(), contours.end(), std::not1(std::ref(contourFilter))), contours.end());
     Track::assignTracks(tracks, contours);
 }
