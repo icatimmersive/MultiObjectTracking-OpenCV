@@ -29,10 +29,12 @@ void Track::assignTracks(Tracks& tracks, std::vector<Contour>& contours) {
             }
         }
         if(minIndex == -1) {
-            continue;
+            // No contour found, so track becomes invisible
+            track->update();
+        } else {
+            contours.erase(contours.begin() + minIndex);
+            track->update(contours[minIndex]);
         }
-        contours.erase(contours.begin() + minIndex);
-        track->update(contours[minIndex]);
     }
 }
 
@@ -72,7 +74,19 @@ const TrackingData& Track::getPrediction() {
     return prediction;
 }
 
+void Track::update() {
+    visible = false;
+    age++;
+    invisibleAge++;
+}
+
 void Track::update(Contour& new_contour) {
+    // Update metadata
+    visible = true;
+    age++;
+    visibleCount++;
+    invisibleAge = 0;
+    // Update filter
     contour = new_contour;
     bbox = cv::boundingRect(contour);
     cv::Point center = calcCentroid(contour);

@@ -35,7 +35,7 @@ private:
     int age;
     int visibleCount;
     int invisibleAge;
-    bool invisible;
+    bool visible;
     cv::Rect bbox;
     Contour contour;
     TrackingData prediction;
