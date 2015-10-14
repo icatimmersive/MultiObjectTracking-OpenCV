@@ -14,4 +14,6 @@ public:
 protected:
     Tracks tracks;
     cv::UMat maskImage;
+
+    void processContours(Tracks& tracks, std::vector<Contour>& contours);
 };
