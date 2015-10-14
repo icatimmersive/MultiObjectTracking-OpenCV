@@ -44,6 +44,22 @@ int Track::getId() {
     return id;
 }
 
+int Track::getAge() {
+    return age;
+}
+
+int Track::getVisibleCount() {
+    return visibleCount;
+}
+
+int Track::getInvisibleAge() {
+    return invisibleAge;
+}
+
+bool Track::isVisible() {
+    return visible;
+}
+
 const cv::Rect& Track::getBBox() {
     return bbox;
 }

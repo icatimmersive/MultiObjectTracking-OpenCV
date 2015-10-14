@@ -18,13 +18,24 @@ public:
     Track(int id, Contour& contour);
 
     int getId();
+    int getAge();
+    int getVisibleCount();
+    int getInvisibleAge();
+    bool isVisible();
     const cv::Rect& getBBox();
     const Contour& getContour();
     const TrackingData& getPrediction();
+    // This track was not assigned a contour, so increase age and mark as invisible
+    void update();
+    // This track was assigned a contour, so increase age and update filter
     void update(Contour& new_contour);
 
 private:
     int id;
+    int age;
+    int visibleCount;
+    int invisibleAge;
+    bool invisible;
     cv::Rect bbox;
     Contour contour;
     TrackingData prediction;
