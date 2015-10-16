@@ -44,7 +44,7 @@ size_t Track::getNextIndex() {
     return instances + 1;
 }
 
-Track::Track(Contour& contour, int id) : id(id) {
+Track::Track(Contour& contour, int id) : id(id), age(0), visibleCount(0), invisibleAge(0), visible(true) {
     instances++;
     update(contour);
 }
