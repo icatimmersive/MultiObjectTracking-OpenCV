@@ -89,7 +89,7 @@ void drawTracks(cv::UMat& image, const Tracks& tracks, cv::Point& mousePos, doub
 }
 
 void mouseCallback(int event, int x, int y, int flags, void* data) {
-    if(event != cv::MouseEventTypes::EVENT_MOUSEMOVE) {
+    if(event != cv::EVENT_MOUSEMOVE) {
         return;
     }
     cv::Point& point = *(static_cast<cv::Point*>(data));

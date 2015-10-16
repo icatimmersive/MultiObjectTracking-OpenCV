@@ -7,6 +7,8 @@
 #include "display.h"
 #include "objecttracker.h"
 #include "trackers/difference.h"
+#include "Networking/blob.h"
+#include "Networking/blobSender.h"
 
 void printUsage(std::string progName) {
     std::cout << "Usage: " << progName << " <id> <url or file>" << std::endl;
@@ -15,7 +17,7 @@ void printUsage(std::string progName) {
 int main(int argc, char *argv[]) {
     int id;
     std::string url;
-
+    blobSender sender("dev.mirrorworlds.icat.vt.edu",9999); //set up the blob sender
     // Read arguments and set parameters
     if(argc == 1) {
         // Defaults
@@ -46,6 +48,10 @@ int main(int argc, char *argv[]) {
             if(key == 27) { // Escape pressed
                 break;
             }
+	    //we can construct the blob here, then send it
+	    //sender.writeNewBlob(blob)
+            //sender.writeUpdateBlob(blob)
+            //sender.writeRemoveBlob(blob)
         }
     } catch(const std::exception& ex) {
         std::cerr << "Error occurred: " << ex.what() << std::endl;
