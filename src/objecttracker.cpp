@@ -17,6 +17,12 @@ const Tracks& ObjectTracker::getTracks() {
     return tracks;
 }
 
+const std::unordered_set<int> ObjectTracker::getDeletedTracks() {
+    std::unordered_set<int> copy(deletedTracks);
+    deletedTracks.clear();
+    return copy;
+}
+
 cv::UMat& ObjectTracker::getMaskImage() {
     return maskImage;
 }
@@ -24,7 +30,15 @@ cv::UMat& ObjectTracker::getMaskImage() {
 void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contours) {
     // Delete lost tracks:
     // Tracks that are too sporadically visible, or have been invisible for too long
-    tracks.erase(std::remove_if(tracks.begin(), tracks.end(), isTrackLost), tracks.end());
+    for(auto it = tracks.begin(); it != tracks.end();) {
+        std::unique_ptr<Track>& track = *it;
+        if(isTrackLost(track)) {
+            deletedTracks.insert(track->getId());
+            it = tracks.erase(it);
+        } else {
+            it++;
+        }
+    }
     // Assign contours to existing tracks
     Track::assignTracks(tracks, contours);
     // Create new tracks for unassigned contours
