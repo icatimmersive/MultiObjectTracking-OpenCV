@@ -22,7 +22,7 @@ const cv::Scalar fpsColor(255, 255, 255); // white
 
 // FPS
 
-Display::FPS::FPS(int size) : prevTick(0), size(size), index(0), sum(0), filled(false) {
+Display::FPS::FPS(int size) : prevTick(0), size(size), index(0), sum(0), total(0) {
     ticks = new std::int64_t[size];
     std::fill(ticks, ticks + size, 0);
 }
@@ -32,11 +32,12 @@ Display::FPS::~FPS() {
 }
 
 void Display::FPS::update(std::int64_t newTick) {
-    if(prevTick == 0) {
+    if(total < size) {
+        total++;
+    }
+    if(total == 1) {
         prevTick = newTick;
         return;
-    } else if(!filled && index == size - 1) {
-        filled = true;
     }
     std::int64_t tickDiff = newTick - prevTick;
     prevTick = newTick;
@@ -46,11 +47,11 @@ void Display::FPS::update(std::int64_t newTick) {
     index = (index == size - 1 ? 0 : index + 1);
 }
 
-// Display
-
 double Display::FPS::getFPS() {
-    return (filled ? cv::getTickFrequency() / (sum * 1.0 / size) : 0.0);
+    return (cv::getTickFrequency() / (sum * 1.0 / total));
 }
+
+// Display
 
 void drawTracks(cv::UMat& image, const Tracks& tracks, cv::Point& mousePos, double fps) {
     for(const std::unique_ptr<Track>& track : tracks) {

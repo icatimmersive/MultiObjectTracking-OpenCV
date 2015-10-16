@@ -25,8 +25,8 @@ private:
         std::int64_t prevTick;
         int size;
         int index;
+        int total;
         std::uint64_t sum;
-        bool filled;
         std::int64_t *ticks;
     };
 
