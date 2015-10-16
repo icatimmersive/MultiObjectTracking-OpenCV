@@ -18,6 +18,7 @@ public:
     static size_t getNextIndex();
 
     Track(Contour& contour, int id = getNextIndex());
+    ~Track();
 
     int getId();
     int getAge();

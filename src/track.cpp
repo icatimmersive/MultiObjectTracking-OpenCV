@@ -49,6 +49,9 @@ Track::Track(Contour& contour, int id) : id(id) {
     update(contour);
 }
 
+Track::~Track() {
+}
+
 int Track::getId() {
     return id;
 }
