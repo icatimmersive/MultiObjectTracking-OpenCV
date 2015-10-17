@@ -1,5 +1,9 @@
 # CMake
 build/
 
+# OpenCV
+opencv/opencv
+opencv/opencv_contrib
+
 # Misc
 *.mov
