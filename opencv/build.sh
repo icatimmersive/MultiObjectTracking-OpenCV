@@ -42,5 +42,9 @@ cmake $CMAKE_OPTIONS ..
 echo1 "Press [ENTER] to begin building"
 read
 make -j4
+if [ "x$?" != "x0" ]; then
+	echoE "Error building OpenCV"
+	exit
+fi
 echo1 "Installing OpenCV..."
 sudo make install
