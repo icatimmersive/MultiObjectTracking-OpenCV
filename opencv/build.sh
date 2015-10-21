@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 function echo1() {
 	echo -e "\n\033[1;32m$1\033[0m"
