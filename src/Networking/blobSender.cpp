@@ -24,7 +24,7 @@ bool blobSender::sendBlob(Blob *const blob) {
     string ageStr(blob->age);
 
     sender->writeDataToServer("{\"age\":" + ageStr + ", \"connectionType\": \"DATASOURCE\"," + "\"id\":" + to_string(blob->id) +
-",\"cameraID\":" + to_string(blob->cameraID) +
+                     ",\"cameraID\":" + to_string(blob->cameraID) +
                      ",\"origin\": {\"x\":" + to_string(blob->origin_x) + ",\"y\":" + to_string(blob->origin_y) +
                      ",\"z\":" + to_string(blob->origin_z) + "}, \"orientation\": {\"x\":" +
                      to_string(blob->orientation_x) + ", \"y\":" + to_string(blob->orientation_y) + ", \"z\":" +
