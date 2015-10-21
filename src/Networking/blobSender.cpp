@@ -23,7 +23,7 @@ bool blobSender::sendRemoveBlob(Blob *const blob) {
 bool blobSender::sendBlob(Blob *const blob) {
     string ageStr(blob->age);
 
-    sender->writeDataToServer("{\"age\":" + ageStr + ", \"connectionType\": \"DATASOURCE\"," + "\"id\":" + to_string(blob->id) +
+    return sender->writeDataToServer("{\"age\":" + ageStr + ", \"connectionType\": \"DATASOURCE\"," + "\"id\":" + to_string(blob->id) +
                      ",\"cameraID\":" + to_string(blob->cameraID) +
                      ",\"origin\": {\"x\":" + to_string(blob->origin_x) + ",\"y\":" + to_string(blob->origin_y) +
                      ",\"z\":" + to_string(blob->origin_z) + "}, \"orientation\": {\"x\":" +
@@ -33,5 +33,5 @@ bool blobSender::sendBlob(Blob *const blob) {
                      "\"boundingBox\":{\"x\":" + to_string(blob->bounding_x) + ", \"y\":" +
                      to_string(blob->bounding_y) +
                      ",\"width\":" + to_string(blob->bounding_width) + ",\"height\":" +
-                     to_string(blob->bounding_height) + "}}&");
+                     to_string(blob->bounding_height) + "}}&") == 0;
 }
