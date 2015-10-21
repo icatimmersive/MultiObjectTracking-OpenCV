@@ -14,9 +14,9 @@ struct Blob {
     int bounding_height;
 
     //these fields were not being set by matlab
-    int origin_x = 0;
-    int origin_y = 0;
-    int origin_z = 0;
+    double origin_x = 0.0;
+    double origin_y = 0.0;
+    double origin_z = 0.0;
     int orientation_x = 0;
     int orientation_y = 0;
     int orientation_z = 0;

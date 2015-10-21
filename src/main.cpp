@@ -36,8 +36,8 @@ void sendTracks(int cameraId, ObjectTracker* tracker, blobSender& sender) {
         blobData.bounding_y = bbox.y;
         blobData.bounding_width = bbox.width;
         blobData.bounding_height = bbox.height;
-        blobData.origin_x = (bbox.x + bbox.width) /2;
-        blobData.origin_y = (bbox.y + bbox.height) /2;
+        blobData.origin_x = (bbox.x + bbox.width) /2.0;
+        blobData.origin_y = (bbox.y + bbox.height) /2.0;
 
         if(track->getAge() == 1) {
             sender.sendNewBlob(&blobData);
