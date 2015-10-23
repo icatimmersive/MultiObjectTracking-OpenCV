@@ -13,4 +13,6 @@ public:
 
 private:
     cv::Ptr<cv::BackgroundSubtractor> diffEngine;
+    // Skip some of the first few frames while training
+    int skipped;
 };
