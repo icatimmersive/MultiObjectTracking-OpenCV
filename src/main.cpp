@@ -100,5 +100,7 @@ int main(int argc, char *argv[]) {
         }
     } catch(const std::exception& ex) {
         std::cerr << "Error occurred: " << ex.what() << std::endl;
+        return 1;
     }
+    return 0;
 }
