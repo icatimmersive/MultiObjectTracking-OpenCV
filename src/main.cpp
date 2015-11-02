@@ -82,8 +82,7 @@ void cropImage(int camId, cv::UMat& frame) {
         rectCrop = {130, 100, 800, 570};
         break;
     default:
-        rectCrop = {130, 260, 800, 460};
-        break;
+        return;
     }
     cv::UMat imCrop = frame(rectCrop);
     frame = imCrop;
