@@ -13,6 +13,7 @@
 #include "trackers/difference.h"
 #include "Networking/blob.h"
 #include "Networking/blobSender.h"
+#include <opencv2/calib3d.hpp>
 
 const std::string serverURL = "dev.mirrorworlds.icat.vt.edu";
 const int serverPort        = 9999;
@@ -116,6 +117,16 @@ int main(int argc, char *argv[]) {
         cv::UMat frame;
         while(camera.getVideo().read(frame)) {
             cropImage(id, frame);
+//by nuo 20151025 unwarping
+/*
+cv::Mat camera_matrix, distortion;
+cv::FileStorage fs("camparam.txt", cv::FileStorage::READ);
+cv::FileNode fn = fs["IntParam"];
+fn["camera_matrix"] >> camera_matrix;
+fn["distortion"] >> distortion;
+cv::fisheye::undistortImage(frame,frame,camera_matrix, distortion, camera_matrix);
+*/
+//nuo end
             tracker->processFrame(frame);
             display.showFrame(frame, tracker->getMaskImage(), tracker->getTracks());
             sendTracks(id, {frame.cols, frame.rows}, tracker, sender);
