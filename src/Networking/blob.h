@@ -24,6 +24,10 @@ struct Blob {
     char const *age; //can be added by correct wrapper call
     //updateTime
     //creationTime
+
+    // quick fix for camera image size
+    int image_width;
+    int image_height;
 };
 typedef struct Blob Blob;
 #endif //MULTIOBJECTTRACKING_C_BLOB_H

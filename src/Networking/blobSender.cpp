@@ -33,5 +33,7 @@ bool blobSender::sendBlob(Blob *const blob) {
                      "\"boundingBox\":{\"x\":" + to_string(blob->bounding_x) + ", \"y\":" +
                      to_string(blob->bounding_y) +
                      ",\"width\":" + to_string(blob->bounding_width) + ",\"height\":" +
-                     to_string(blob->bounding_height) + "}}&") == 0;
+                     to_string(blob->bounding_height) + ",\"image_width\":" +
+                     to_string(blob->image_width) + ",\"image_height\":" +
+                     to_string(blob->image_height) + "}}&") == 0;
 }
