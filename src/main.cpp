@@ -17,7 +17,7 @@
 const std::string serverURL = "dev.mirrorworlds.icat.vt.edu";
 const int serverPort        = 9999;
 
-void sendTracks(int cameraId, ObjectTracker* tracker, blobSender& sender) {
+void sendTracks(int cameraId, cv::Size imgSize, ObjectTracker* tracker, blobSender& sender) {
     Blob blobData;
     memset(&blobData, 0, sizeof(blobData));
     blobData.cameraID = cameraId;
@@ -36,8 +36,11 @@ void sendTracks(int cameraId, ObjectTracker* tracker, blobSender& sender) {
         blobData.bounding_y = bbox.y;
         blobData.bounding_width = bbox.width;
         blobData.bounding_height = bbox.height;
-        blobData.origin_x = (bbox.x + bbox.width) /2.0;
-        blobData.origin_y = (bbox.y + bbox.height) /2.0;
+        blobData.origin_x = bbox.x + (bbox.width * 0.5);
+        blobData.origin_y = bbox.y + (bbox.height * 0.5);
+
+        blobData.image_width = imgSize.width;
+        blobData.image_height = imgSize.height;
 
         if(track->getAge() == 1) {
             sender.sendNewBlob(&blobData);
@@ -91,7 +94,7 @@ int main(int argc, char *argv[]) {
         while(camera.getVideo().read(frame)) {
             tracker->processFrame(frame);
             display.showFrame(frame, tracker->getMaskImage(), tracker->getTracks());
-            sendTracks(id, tracker, sender);
+            sendTracks(id, {frame.cols, frame.rows}, tracker, sender);
             // Only the least-signficant byte is used, sometimes the rest is garbage so 0xFF is needed
             int key = cv::waitKey(10) & 0xFF;
             if(key == 27) { // Escape pressed
