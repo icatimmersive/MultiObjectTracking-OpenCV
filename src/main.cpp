@@ -65,6 +65,29 @@ std::string parseURL(std::string arg) {
     }
 }
 
+void cropImage(int camId, cv::UMat& frame) {
+    cv::Rect rectCrop;
+    switch(camId) {
+    case 2:
+        rectCrop = {130, 150, 800, 540};
+        break;
+    case 3:
+        rectCrop = {130, 260, 800, 550};
+        break;
+    case 4:
+        rectCrop = {130, 180, 800, 570};
+        break;
+    case 5:
+        rectCrop = {130, 100, 800, 570};
+        break;
+    default:
+        rectCrop = {130, 260, 800, 460};
+        break;
+    }
+    cv::UMat imCrop = frame(rectCrop);
+    frame = imCrop;
+}
+
 int main(int argc, char *argv[]) {
     int id;
     std::string url;
@@ -92,6 +115,7 @@ int main(int argc, char *argv[]) {
     try {
         cv::UMat frame;
         while(camera.getVideo().read(frame)) {
+            cropImage(id, frame);
             tracker->processFrame(frame);
             display.showFrame(frame, tracker->getMaskImage(), tracker->getTracks());
             sendTracks(id, {frame.cols, frame.rows}, tracker, sender);
