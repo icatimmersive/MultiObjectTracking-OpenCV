@@ -103,14 +103,14 @@ Display::Display(int cameraId) : fps(100) {
     imageWinTitle = "Camera " + std::to_string(cameraId);
     blobWinTitle = imageWinTitle + " Blobs";
     cv::namedWindow(imageWinTitle);
-    cv::namedWindow(blobWinTitle);
+//     cv::namedWindow(blobWinTitle);
     cv::setMouseCallback(imageWinTitle, mouseCallback, (void*) &mousePos);
-    cv::setMouseCallback(blobWinTitle, mouseCallback, (void*) &mousePos);
+//     cv::setMouseCallback(blobWinTitle, mouseCallback, (void*) &mousePos);
 }
 
 Display::~Display() {
     cv::destroyWindow(imageWinTitle);
-    cv::destroyWindow(blobWinTitle);
+    //cv::destroyWindow(blobWinTitle);
 }
 
 void Display::showFrame(cv::UMat& frame, cv::UMat& maskImage, const Tracks& tracks) {
@@ -118,18 +118,20 @@ void Display::showFrame(cv::UMat& frame, cv::UMat& maskImage, const Tracks& trac
     fps.update(cv::getTickCount());
     double fpsValue = fps.getFPS();
     // Move windows to be side by side
-    cv::moveWindow(imageWinTitle, 0, 0);
-    cv::moveWindow(blobWinTitle, frame.cols, 0);
+//     cv::moveWindow(imageWinTitle, 0, 0);
+//     cv::moveWindow(blobWinTitle, frame.cols, 0);
     // Convert 1-channel mask to BGR image
     cv::cvtColor(maskImage, rgbMaskImage, cv::COLOR_GRAY2BGR);
     // Display just the blob and track information
     cv::UMat blobImage = rgbMaskImage.clone();
     drawTracks(blobImage, tracks, mousePos, fpsValue);
-    cv::imshow(blobWinTitle, blobImage);
+//     cv::imshow(blobWinTitle, blobImage);
+//     cv::resizeWindow(blobWinTitle,300,300);
     // Color the mask so it shows up better when overlaid
     rgbMaskImage.setTo(maskColor, maskImage);
     // Add the colored mask image as a semi-transparent overlay to the camera image
     cv::addWeighted(frame, 1.0, rgbMaskImage, 0.65, 0.0, buffer);
     drawTracks(buffer, tracks, mousePos, fpsValue);
     cv::imshow(imageWinTitle, buffer);
+    cv::resizeWindow(imageWinTitle,300,300);
 }
