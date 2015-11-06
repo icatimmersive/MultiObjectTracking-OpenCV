@@ -7,3 +7,6 @@ opencv/opencv_contrib
 
 # Misc
 *.mov
+
+# ViM
+*.swp
