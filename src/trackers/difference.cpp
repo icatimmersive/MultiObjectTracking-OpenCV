@@ -12,8 +12,8 @@ void smoothMask(cv::UMat& maskImage) {
     // Median filter for smoothing
     cv::medianBlur(maskImage, maskImage, 3); // MATLAB code uses medfilt2, which uses 3x3 aperture
     // Morphological operations to remove noise and fill in holes
-    cv::Mat kernel = cv::getStructuringElement(cv::MorphShapes::MORPH_ELLIPSE, cv::Size(4, 4));
-    cv::morphologyEx(maskImage, maskImage, cv::MorphTypes::MORPH_CLOSE, kernel);
+    cv::Mat kernel = cv::getStructuringElement(cv::MorphShapes::MORPH_ELLIPSE, cv::Size(9, 9));
+    cv::morphologyEx(maskImage, maskImage, cv::MorphTypes::MORPH_OPEN, kernel);
 }
 
 // Returns true if the contour is usable
