@@ -55,12 +55,15 @@ void printUsage(std::string progName) {
     std::cout << "Usage: " << progName << " <id> <ip or url or file>" << std::endl;
 }
 
-std::string parseURL(std::string arg) {
+std::string parseURL(int camId, std::string arg) {
     in_addr ipaddr;
     if(inet_pton(AF_INET, arg.c_str(), &ipaddr) == 1) {
         std::cout << "Using camera at address " << arg << std::endl;
-//         return std::string("http://admin:admin@") + arg + std::string("/video.cgi?.mjpg");
-        return std::string("http://root:admin@") + arg + std::string("/video.mjpg");
+        if(camId < 6) {
+            return std::string("http://admin:admin@") + arg + std::string("/video.cgi?.mjpg");
+        } else {
+            return std::string("http://root:admin@") + arg + std::string("/video.mjpg");
+        }
     } else {
         std::cout << "Using file/URL " << arg << std::endl;
         return arg;
@@ -82,9 +85,9 @@ void cropImage(int camId, cv::UMat& frame) {
     case 5:
         rectCrop = {130, 100, 800, 570};
         break;
-    case 6:
-        rectCrop = {0, 0, 1056, 850};
-        break;
+//    case 6:
+//        rectCrop = {0, 0, 1056, 850};
+//        break;
     case 7:
         rectCrop = {0, 200, 1056, 630};
         break;
@@ -118,7 +121,7 @@ int main(int argc, char *argv[]) {
         return 0;
     } else {
         id = std::atoi(argv[1]);
-        url = parseURL(argv[2]);
+        url = parseURL(id, argv[2]);
     }
 
     // Initialize system objects
