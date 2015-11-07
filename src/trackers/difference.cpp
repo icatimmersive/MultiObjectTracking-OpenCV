@@ -5,7 +5,7 @@
 #include <functional>
 #include <opencv2/video.hpp>
 
-const int skipFrames = 5;
+const int skipFrames = 150;
 const double contourMinArea = 400.0;
 
 void smoothMask(cv::UMat& maskImage) {
@@ -35,7 +35,7 @@ DifferenceTracker::~DifferenceTracker() {
 
 void DifferenceTracker::processFrame(cv::UMat& frame) {
     // third parameter = rate of background update (0.0 is no update)
-    diffEngine->apply(frame, maskImage, 0.001);
+    diffEngine->apply(frame, maskImage, 0.002);
     // Apply operations to improve mask image
     smoothMask(maskImage);
     // Now return if this frame should be skipped

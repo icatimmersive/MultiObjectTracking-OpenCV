@@ -2,7 +2,7 @@
 #include <memory>
 #include <algorithm>
 
-const int invisibleMax = 20;
+const int invisibleMax = 5;
 const double visibleThreshold = 0.6;
 
 bool isTrackLost(std::unique_ptr<Track>& track) {
