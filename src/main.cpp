@@ -85,20 +85,20 @@ void cropImage(int camId, cv::UMat& frame) {
     case 5:
         rectCrop = {130, 100, 800, 570};
         break;
-//    case 6:
-//        rectCrop = {0, 0, 1056, 850};
-//        break;
+    case 6:
+        rectCrop = {180, 90, 800, 800};
+        break; 
     case 7:
-        rectCrop = {0, 200, 1056, 630};
+        rectCrop = {180, 240, 700, 650};
         break;
     case 8:
-        rectCrop = {0, 250, 1056, 630};
+        rectCrop = {180, 250, 700, 650};
         break;
     case 9:
-        rectCrop = {0, 320, 1056, 530};
+        rectCrop = {180, 250, 700, 600};
         break;
     case 10:
-        rectCrop = {0, 330, 1056, 726};
+        rectCrop = {180, 250, 700, 726};
         break;
     default:
         return;
@@ -135,6 +135,7 @@ int main(int argc, char *argv[]) {
         cv::UMat frame;
         while(camera.getVideo().read(frame)) {
             cropImage(id, frame);
+            //cv::cvtColor(frame,frame,CV_BGR2HSV);     //hsv SPACE TO ELIMINATE THE SHADOW EFFECT
 //by nuo 20151025 unwarping
 /*
 cv::Mat camera_matrix, distortion;
