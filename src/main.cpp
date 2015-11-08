@@ -73,6 +73,9 @@ std::string parseURL(int camId, std::string arg) {
 void cropImage(int camId, cv::UMat& frame) {
     cv::Rect rectCrop;
     switch(camId) {
+    case 1:
+        rectCrop = {100, 100, 900, 700};
+        break;
     case 2:
         rectCrop = {130, 150, 800, 540};
         break;
@@ -89,16 +92,16 @@ void cropImage(int camId, cv::UMat& frame) {
         rectCrop = {180, 90, 800, 800};
         break; 
     case 7:
-        rectCrop = {180, 240, 700, 650};
+        rectCrop = {180, 240, 750, 650};
         break;
     case 8:
-        rectCrop = {180, 250, 700, 650};
+        rectCrop = {180, 250, 750, 650};
         break;
     case 9:
-        rectCrop = {180, 250, 700, 600};
+        rectCrop = {180, 250, 750, 800};
         break;
     case 10:
-        rectCrop = {180, 250, 700, 726};
+        rectCrop = {180, 250, 750, 726};
         break;
     default:
         return;
