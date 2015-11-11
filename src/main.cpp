@@ -50,7 +50,11 @@ void sendTracks(int cameraId, cv::Size imgSize, ObjectTracker* tracker, blobSend
 }
 
 void printUsage(std::string progName) {
-    std::cout << "Usage: " << progName << " <id> <ip or url or file>" << std::endl;
+    std::cout << "Usage: " << progName << " <id> [path]" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Where [path] is optional and can be an IP address, a URL, or a video file." << std::endl;
+    std::cout << "If [path] is an IP address, the correct URL will be guessed based on the camera ID." << std::endl;
+    std::cout << "If [path] is omitted, camera parameters will be read from the configuration file." << std::endl;
 }
 
 std::string parseURL(int camId, std::string arg) {
@@ -75,6 +79,11 @@ std::string parseURL(int camId, std::string arg) {
     }
 }
 
+std::string getURL(int camId) {
+    CameraInfo camInfo = Config::get().getCameraInfo(camId);
+    return parseURL(camId, camInfo.ip);
+}
+
 int main(int argc, char *argv[]) {
     std::string serverURL = Config::get().getServerURL();
     int serverPort = Config::get().getServerPort();
@@ -87,9 +96,12 @@ int main(int argc, char *argv[]) {
         std::cout << "Using default video input" << std::endl;
         id = 0;
         url = "../walk-cut.mov";
-    } else if(argc != 3 || (argc == 2 && std::string(argv[1]) == "--help")) {
+    } else if((argc == 2 && std::string(argv[1]) == "--help") || argc > 3) {
         printUsage(argv[0]);
         return 0;
+    } else if(argc == 2) {
+        id = std::atoi(argv[1]);
+        url = getURL(id);
     } else {
         id = std::atoi(argv[1]);
         url = parseURL(id, argv[2]);
