@@ -4,7 +4,9 @@ The extra modules are part of the opencv_contrib repository.
 
 ## Automatic building
 Use the `build.sh` shell script to download and build OpenCV automatically. You will need
-C++ build tools, CMake, make, git, and ideally Qt development files installed.
+C++ build tools, CMake, make, git, and ideally Qt development files installed. By default
+the script will ask questions about the build process. Use `--non-interactive` to build
+without supervision, check `--help` for more information.
 
 ## Manual building
 ### Download OpenCV and extras
