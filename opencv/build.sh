@@ -21,31 +21,53 @@ CMAKE_OPTIONS="-DCMAKE_BUILD_TYPE=Release -DWITH_QT=ON -DWITH_OPENGL=ON"
 CMAKE_SAMPLES="-DBUILD_EXAMPLES=ON -DINSTALL_C_EXAMPLES=ON -DINSTALL_PYTHON_EXAMPLES=ON"
 PACKAGES="git cmake build-essential qt5-default python-dev python3-dev python-numpy python3-numpy default-jdk default-jre ant libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libv4l-dev"
 
-if [ "x$1" == "x--help" ]; then
-	echo1 "Build script for OpenCV 3.x"
-	echo ""
-	echo "Usage: $0 [--non-interactive]"
-	echo ""
-	echo "In non-interactive mode, required packages will be installed (if apt-get is available) and samples will be built."
-	exit
-fi
+INSTALL="n"
+SAMPLES="n"
 
-if [ "x$1" == "x--non-interactive" ]; then
-	echo1 "Non-interactive mode"
-	NONINT="y"
-fi
+while [ "x$#" != "x0" ]; do
+	case "x$1" in
+	"x--help")
+		echo1 "Build script for OpenCV 3.x"
+		echo ""
+		echo "Usage: $0 [--non-interactive [--install-packages] [--build-samples]]"
+		echo ""
+		echo "In non-interactive mode, by default required packages will not be installed and samples will not be built, unless otherwise specified."
+		exit
+		;;
+	"x--non-interactive")
+		echo1 "Non-interactive mode"
+		NONINT="y"
+		;;
+	"x--install-packages")
+		INSTALL="y"
+		;;
+	"x--build-samples")
+		SAMPLES="y"
+		;;
+	esac
+	shift
+done
 
 if which apt-get > /dev/null 2>&1; then
 	echo1n "\nInstall required packages? [Y/n] "
 	if [ "x$NONINT" == "xy" ]; then
-		echo "y"
-		INSTALL="y"
+		echo $INSTALL
 	else
 		read INSTALL
 	fi
 	if [ "x$INSTALL" != "xn" -a "x$INSTALL" != "xN" ]; then
 		echo "Installing packages..."
-		sudo apt-get -y install $PACKAGES
+		# Don't use sudo in non-interactive mode
+		if [ "x$NONINT" == "xy" ]; then
+			SUDO=""
+		else
+			SUDO="sudo"
+		fi
+		$SUDO apt-get -y install $PACKAGES
+		if [ "x$NONINT" == "xy" -a "x$?" != "x0" ]; then
+			echoE "apt-get failed; maybe requires root"
+			exit 1
+		fi
 	fi
 else
 	echoE "\nNo apt-get found; required packages will not be installed"
@@ -53,8 +75,7 @@ fi
 
 echo1n "\nBuild samples? [Y/n] "
 if [ "x$NONINT" == "xy" ]; then
-	echo "y"
-	INSTALL="y"
+	echo $SAMPLES
 else
 	read SAMPLES
 fi
