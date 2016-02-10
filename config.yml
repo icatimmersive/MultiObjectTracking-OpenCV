@@ -26,7 +26,7 @@ cameras:
       desc: Learning Lab A
       class: oncam
       ip: '192.168.1.15'
-      crop: [130, 150, 800, 540]
+      crop: [70, 30, 900, 800]
 
     - id: 3
       name: learningB
