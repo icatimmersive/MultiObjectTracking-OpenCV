@@ -28,6 +28,7 @@ struct Blob {
     // quick fix for camera image size
     int image_width;
     int image_height;
+    double area;
 };
 typedef struct Blob Blob;
 #endif //MULTIOBJECTTRACKING_C_BLOB_H

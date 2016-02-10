@@ -6,7 +6,8 @@
 #include <opencv2/video.hpp>
 
 const int skipFrames = 150;
-const double contourMinArea = 400.0;
+const double contourMinArea = 800.0;
+const double contourMaxArea = 20000.0;
 
 void smoothMask(cv::UMat& maskImage) {
     // Median filter for smoothing
@@ -14,19 +15,20 @@ void smoothMask(cv::UMat& maskImage) {
     // Morphological operations to remove noise and fill in holes
     cv::Mat kernel = cv::getStructuringElement(cv::MorphShapes::MORPH_ELLIPSE, cv::Size(14, 14));
     cv::morphologyEx(maskImage, maskImage, cv::MorphTypes::MORPH_OPEN, kernel);
+    cv::morphologyEx(maskImage, maskImage, cv::MorphTypes::MORPH_DILATE, kernel);
 }
 
 // Returns true if the contour is usable
 bool contourFilter(Contour& contour) {
     double contourArea = cv::contourArea(contour);
-    return contourArea >= contourMinArea;
+    return ((contourArea >= contourMinArea) && (contourArea < contourMaxArea));
 }
 
 DifferenceTracker::DifferenceTracker() : skipped(0) {
     // Initialize difference engine and blob detector
     // Parameters taken from original MATLAB code
 //     diffEngine = cv::bgsegm::createBackgroundSubtractorMOG(100, 2, 0.01); // requires contrib module "bgsegm"
-    diffEngine = cv::createBackgroundSubtractorKNN(1000, 800.0, false);
+    diffEngine = cv::createBackgroundSubtractorKNN(500, 400.0, false);
 //     diffEngine = cv::createBackgroundSubtractorMOG2(100, 400.0, true);
 }
 
@@ -35,7 +37,7 @@ DifferenceTracker::~DifferenceTracker() {
 
 void DifferenceTracker::processFrame(cv::UMat& frame) {
     // third parameter = rate of background update (0.0 is no update)
-    diffEngine->apply(frame, maskImage, 0.002);
+    diffEngine->apply(frame, maskImage, 0.0005);
     // Apply operations to improve mask image
     smoothMask(maskImage);
     // Now return if this frame should be skipped

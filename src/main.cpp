@@ -39,6 +39,7 @@ void sendTracks(int cameraId, cv::Size imgSize, ObjectTracker* tracker, blobSend
         blobData.bounding_height = bbox.height;
         blobData.origin_x = bbox.x + (bbox.width * 0.5);
         blobData.origin_y = bbox.y + (bbox.height * 0.5);
+        blobData.area = cv::contourArea(track->getContour());
 
         blobData.image_width = imgSize.width;
         blobData.image_height = imgSize.height;
