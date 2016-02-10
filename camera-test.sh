@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 CAMS="1,14 2,15 3,11 4,10 5,12 6,16 7,17 8,18 9,19 10,20"
 FILENAME=".cam-results"
