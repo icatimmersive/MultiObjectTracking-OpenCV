@@ -48,6 +48,19 @@ while [ "x$#" != "x0" ]; do
 	shift
 done
 
+echo1n "\nBuild samples? [Y/n] "
+if [ "x$NONINT" == "xy" ]; then
+	echo $SAMPLES
+else
+	read SAMPLES
+fi
+if [ "x$SAMPLES" != "xn" -a "x$SAMPLES" != "xN" ]; then
+	echo "Will build samples"
+	CMAKE_OPTIONS="$CMAKE_OPTIONS $CMAKE_SAMPLES"
+else
+	echo "Not building samples"
+fi
+
 if which apt-get > /dev/null 2>&1; then
 	echo1n "\nInstall required packages? [Y/n] "
 	if [ "x$NONINT" == "xy" ]; then
@@ -73,23 +86,11 @@ else
 	echoE "\nNo apt-get found; required packages will not be installed"
 fi
 
-echo1n "\nBuild samples? [Y/n] "
-if [ "x$NONINT" == "xy" ]; then
-	echo $SAMPLES
-else
-	read SAMPLES
-fi
-if [ "x$SAMPLES" != "xn" -a "x$SAMPLES" != "xN" ]; then
-	echo "Will build samples"
-	CMAKE_OPTIONS="$CMAKE_OPTIONS $CMAKE_SAMPLES"
-else
-	echo "Not building samples"
-fi
-
 echo1 "\nDownloading OpenCV..."
 if [ -d opencv ]; then
 	cd opencv
 	git pull
+	cd ..
 else
 	git clone --depth=1 https://github.com/Itseez/opencv.git
 fi
@@ -97,7 +98,8 @@ fi
 echo1 "\nDownloading OpenCV extra modules..."
 if [ -d opencv_contrib ]; then
 	cd opencv_contrib
-	git pul
+	git pull
+	cd ..
 else
 	git clone --depth=1 https://github.com/Itseez/opencv_contrib.git
 fi
