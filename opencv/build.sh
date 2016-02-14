@@ -120,7 +120,8 @@ echo1 "Press [ENTER] to begin building"
 if [ "x$NONINT" != "xy" ]; then
 	read
 fi
-make -j4
+NUMCPUS=`grep -c '^processor' /proc/cpuinfo`
+make -j$NUMCPUS
 if [ "x$?" != "x0" ]; then
 	echoE "Error building OpenCV"
 	exit
