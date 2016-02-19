@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
+#include "config.h"
 #include "camera.h"
 #include "display.h"
 #include "track.h"
@@ -14,9 +15,6 @@
 #include "Networking/blob.h"
 #include "Networking/blobSender.h"
 #include <opencv2/calib3d.hpp>
-
-const std::string serverURL = "dev.mirrorworlds.icat.vt.edu";
-const int serverPort        = 9999;
 
 void sendTracks(int cameraId, cv::Size imgSize, ObjectTracker* tracker, blobSender& sender) {
     Blob blobData;
@@ -53,17 +51,28 @@ void sendTracks(int cameraId, cv::Size imgSize, ObjectTracker* tracker, blobSend
 }
 
 void printUsage(std::string progName) {
-    std::cout << "Usage: " << progName << " <id> <ip or url or file>" << std::endl;
+    std::cout << "Usage: " << progName << " <id> [path]" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Where [path] is optional and can be an IP address, a URL, or a video file." << std::endl;
+    std::cout << "If [path] is an IP address, the correct URL will be guessed based on the camera ID." << std::endl;
+    std::cout << "If [path] is omitted, camera parameters will be read from the configuration file." << std::endl;
 }
 
 std::string parseURL(int camId, std::string arg) {
     in_addr ipaddr;
     if(inet_pton(AF_INET, arg.c_str(), &ipaddr) == 1) {
-        std::cout << "Using camera at address " << arg << std::endl;
-        if(camId < 6) {
-            return std::string("http://admin:admin@") + arg + std::string("/video.cgi?.mjpg");
+        Config& config = Config::get();
+        if(config.isCameraDefined(camId)) {
+            CameraInfo camInfo = config.getCameraInfo(camId);
+            CameraClass classInfo = config.getCameraClassInfo(camInfo.className);
+            std::cout << "Using camera " << camId << " (" << camInfo.description << ")" << std::endl;
+            std::string url("http://");
+            url += classInfo.username + ":" + classInfo.password + "@";
+            url += arg + "/" + classInfo.path;
+            return url;
         } else {
-            return std::string("http://root:admin@") + arg + std::string("/video.mjpg");
+            std::cout << "Using camera at address " << arg << std::endl;
+            return std::string("http://admin:admin@") + arg + std::string("/video.cgi?.mjpg");
         }
     } else {
         std::cout << "Using file/URL " << arg << std::endl;
@@ -71,47 +80,15 @@ std::string parseURL(int camId, std::string arg) {
     }
 }
 
-void cropImage(int camId, cv::UMat& frame) {
-    cv::Rect rectCrop;
-    switch(camId) {
-    case 1:
-        rectCrop = {100, 100, 900, 700};
-        break;
-    case 2:
-        rectCrop = {130, 150, 800, 540};
-        break;
-    case 3:
-        rectCrop = {130, 260, 800, 550};
-        break;
-    case 4:
-        rectCrop = {130, 180, 800, 570};
-        break;
-    case 5:
-        rectCrop = {130, 100, 800, 570};
-        break;
-    case 6:
-        rectCrop = {180, 90, 800, 800};
-        break; 
-    case 7:
-        rectCrop = {180, 240, 750, 650};
-        break;
-    case 8:
-        rectCrop = {180, 250, 750, 650};
-        break;
-    case 9:
-        rectCrop = {180, 250, 750, 800};
-        break;
-    case 10:
-        rectCrop = {180, 250, 750, 726};
-        break;
-    default:
-        return;
-    }
-    cv::UMat imCrop = frame(rectCrop);
-    frame = imCrop;
+std::string getURL(int camId) {
+    CameraInfo camInfo = Config::get().getCameraInfo(camId);
+    return parseURL(camId, camInfo.ip);
 }
 
 int main(int argc, char *argv[]) {
+    std::string serverURL = Config::get().getServerURL();
+    int serverPort = Config::get().getServerPort();
+
     int id;
     std::string url;
     // Read arguments and set parameters
@@ -120,9 +97,12 @@ int main(int argc, char *argv[]) {
         std::cout << "Using default video input" << std::endl;
         id = 0;
         url = "../walk-cut.mov";
-    } else if(argc != 3 || (argc == 2 && std::string(argv[1]) == "--help")) {
+    } else if((argc == 2 && std::string(argv[1]) == "--help") || argc > 3) {
         printUsage(argv[0]);
         return 0;
+    } else if(argc == 2) {
+        id = std::atoi(argv[1]);
+        url = getURL(id);
     } else {
         id = std::atoi(argv[1]);
         url = parseURL(id, argv[2]);
@@ -137,19 +117,8 @@ int main(int argc, char *argv[]) {
     // Start video processing
     try {
         cv::UMat frame;
-        while(camera.getVideo().read(frame)) {
-            cropImage(id, frame);
-            //cv::cvtColor(frame,frame,CV_BGR2HSV);     //hsv SPACE TO ELIMINATE THE SHADOW EFFECT
-//by nuo 20151025 unwarping
-/*
-cv::Mat camera_matrix, distortion;
-cv::FileStorage fs("camparam.txt", cv::FileStorage::READ);
-cv::FileNode fn = fs["IntParam"];
-fn["camera_matrix"] >> camera_matrix;
-fn["distortion"] >> distortion;
-cv::fisheye::undistortImage(frame,frame,camera_matrix, distortion, camera_matrix);
-*/
-//nuo end
+        while(camera.getFrame(frame)) {
+            //cv::cvtColor(frame,frame,CV_BGR2HSV); // Convert to HSV to eliminate shadows
             tracker->processFrame(frame);
             display.showFrame(frame, tracker->getMaskImage(), tracker->getTracks());
             sendTracks(id, {frame.cols, frame.rows}, tracker, sender);

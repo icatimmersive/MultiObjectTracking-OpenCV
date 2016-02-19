@@ -1,0 +1,85 @@
+%YAML:1.0
+server:
+    url: dev.mirrorworlds.icat.vt.edu
+    port: 9999
+
+classes:
+    oncam:
+        username: admin
+        password: admin
+        path: video.cgi?.mjpg
+    vivotek:
+        username: root
+        password: admin
+        path: video.mjpg
+
+cameras:
+    - id: 1
+      name: observation
+      desc: Observation Room
+      class: oncam
+      ip: '192.168.1.14'
+      crop: [100, 100, 900, 700]
+
+    - id: 2
+      name: learningA
+      desc: Learning Lab A
+      class: oncam
+      ip: '192.168.1.15'
+      crop: [70, 30, 900, 800]
+
+    - id: 3
+      name: learningB
+      desc: Learning Lab B
+      class: oncam
+      ip: '192.168.1.11'
+      crop: [130, 260, 800, 550]
+
+    - id: 4
+      name: learningC
+      desc: Learning Lab C
+      class: oncam
+      ip: '192.168.1.10'
+      crop: [130, 180, 800, 570]
+
+    - id: 5
+      name: learningD
+      desc: Learning Lab D
+      class: oncam
+      ip: '192.168.1.12'
+      crop: [130, 100, 800, 570]
+
+    - id: 6
+      name: hallwayA
+      desc: Hallway A
+      class: vivotek
+      ip: '192.168.1.16'
+      crop: [180, 90, 800, 800]
+
+    - id: 7
+      name: hallwayB
+      desc: Hallway B
+      class: vivotek
+      ip: '192.168.1.17'
+      crop: [180, 240, 750, 650]
+
+    - id: 8
+      name: hallwayC
+      desc: Hallway C
+      class: vivotek
+      ip: '192.168.1.18'
+      crop: [180, 250, 750, 650]
+
+    - id: 9
+      name: hallwayD
+      desc: Hallway D
+      class: vivotek
+      ip: '192.168.1.19'
+      crop: [180, 250, 750, 800]
+
+    - id: 10
+      name: hallwayE
+      desc: Hallway E
+      class: vivotek
+      ip: '192.168.1.20'
+      crop: [180, 250, 750, 726]
