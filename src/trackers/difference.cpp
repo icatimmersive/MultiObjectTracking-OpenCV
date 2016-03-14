@@ -6,7 +6,7 @@
 #include <opencv2/video.hpp>
 
 const int skipFrames = 150;
-const double contourMinArea = 800.0;
+const double contourMinArea = 1200.0;
 const double contourMaxArea = 20000.0;
 
 void smoothMask(cv::UMat& maskImage) {

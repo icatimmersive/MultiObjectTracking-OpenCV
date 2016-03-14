@@ -10,6 +10,8 @@ typedef cv::Point TrackingData;
 typedef std::vector<cv::Point> Contour;
 typedef std::vector<std::unique_ptr<Track>> Tracks;
 
+cv::Point calcCentroid(Contour& contour);
+
 class Track {
 public:
     static const int costNonassignment = 40;
