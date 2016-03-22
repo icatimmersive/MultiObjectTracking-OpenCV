@@ -4,8 +4,9 @@
 #include <algorithm>
 #include <functional>
 #include <opencv2/video.hpp>
+#include <opencv2/bgsegm.hpp>
 
-const int skipFrames = 150;
+const int skipFrames = 250;
 const double contourMinArea = 1200.0;
 const double contourMaxArea = 20000.0;
 
@@ -27,7 +28,7 @@ bool contourFilter(Contour& contour) {
 DifferenceTracker::DifferenceTracker() : skipped(0) {
     // Initialize difference engine and blob detector
     // Parameters taken from original MATLAB code
-//     diffEngine = cv::bgsegm::createBackgroundSubtractorMOG(100, 2, 0.01); // requires contrib module "bgsegm"
+//     diffEngine = cv::bgsegm::createBackgroundSubtractorMOG(100, 3, 0.7); // requires contrib module "bgsegm"
     diffEngine = cv::createBackgroundSubtractorKNN(500, 400.0, false);
 //     diffEngine = cv::createBackgroundSubtractorMOG2(100, 400.0, true);
 }
