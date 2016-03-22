@@ -1,8 +1,14 @@
 #include "objecttracker.h"
+#include <iostream>
 #include <memory>
 #include <algorithm>
-#include <opencv2/flann/miniflann.hpp>
+#include <iterator>
+#include <opencv2/flann/flann.hpp>
 #include "track.h"
+
+const int kdTreeLeafMax = 3;
+const int nnSearchRadius = 50;
+const int nnMaxResults = 50;
 
 const int invisibleMax = 5;
 const double visibleThreshold = 0.6;
@@ -10,6 +16,29 @@ const double visibleThreshold = 0.6;
 bool isTrackLost(std::unique_ptr<Track>& track) {
     double visiblePercent = track->getVisibleCount() * 1.0 / track->getAge();
     return (visiblePercent < visibleThreshold || track->getInvisibleAge() > invisibleMax);
+}
+
+// Using FLANN to group contours together by centroid
+std::vector<Contour> combineContours(std::vector<Contour>& contours) {
+    std::vector<Contour> combined;
+
+    // Calculate centroids
+    std::vector<cv::Point> contourPoints(contours.size());
+    std::transform(contours.begin(), contours.end(), contourPoints.begin(), calcCentroid);
+
+    // Perform nearest-neighbor search
+    std::cout << cv::Mat(contourPoints) << std::endl;
+    cv::flann::KDTreeIndexParams indexParams(kdTreeLeafMax);
+    cv::flann::Index kdTree(contourPoints, indexParams);
+    std::vector<int> indices;
+    std::vector<float> dists;
+    kdTree.radiusSearch(contourPoints, indices, dists, nnSearchRadius, nnMaxResults);
+    for(int i : indices) {
+        std::cout << i << " ";
+    }
+    std::cout << std::endl;
+
+    return combined;
 }
 
 ObjectTracker::~ObjectTracker() {
@@ -42,10 +71,8 @@ void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contou
             it++;
         }
     }
-    // Using FLANN to group contours together by centroid
-   // std::vector<Contour> combinedContours;
-    //std::vector<cv::Point> contourPoints;
-    //std::transform(contours.begin(), contours.end(), contourPoints.begin(), calcCentroid);
+
+    std::vector<Contour> combinedContours = combineContours(contours);
     
     // Assign contours to existing tracks
     Track::assignTracks(tracks, contours);
