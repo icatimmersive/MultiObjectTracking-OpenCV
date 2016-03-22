@@ -113,19 +113,27 @@ int main(int argc, char *argv[]) {
     Display display(id);
     ObjectTracker* tracker = new DifferenceTracker();
     blobSender sender(serverURL.c_str(), serverPort); // set up networking
+    bool paused = false;
 
     // Start video processing
     try {
         cv::UMat frame;
-        while(camera.getFrame(frame)) {
-            //cv::cvtColor(frame,frame,CV_BGR2HSV); // Convert to HSV to eliminate shadows
-            tracker->processFrame(frame);
-            display.showFrame(frame, tracker->getMaskImage(), tracker->getTracks());
-            sendTracks(id, {frame.cols, frame.rows}, tracker, sender);
+        while(true) {
+            if(!paused) {
+                if(!camera.getFrame(frame)) {
+                    break;
+                }
+                //cv::cvtColor(frame,frame,CV_BGR2HSV); // Convert to HSV to eliminate shadows
+                tracker->processFrame(frame);
+                sendTracks(id, {frame.cols, frame.rows}, tracker, sender);
+            }
+            display.showFrame(frame, tracker->getMaskImage(), tracker->getTracks(), paused);
             // Only the least-signficant byte is used, sometimes the rest is garbage so 0xFF is needed
             int key = cv::waitKey(10) & 0xFF;
             if(key == 27) { // Escape pressed
                 break;
+            } else if(key == ' ') {
+                paused = !paused;
             }
         }
     } catch(const std::exception& ex) {

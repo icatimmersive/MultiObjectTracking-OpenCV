@@ -10,7 +10,7 @@ public:
     Display(int cameraId);
     ~Display();
 
-    void showFrame(cv::UMat& frame, cv::UMat& maskImage, const Tracks& tracks);
+    void showFrame(cv::UMat& frame, cv::UMat& maskImage, const Tracks& tracks, bool paused);
 
 private:
     class FPS {

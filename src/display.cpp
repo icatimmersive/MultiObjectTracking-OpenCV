@@ -53,7 +53,7 @@ double Display::FPS::getFPS() {
 
 // Display
 
-void drawTracks(cv::UMat& image, const Tracks& tracks, cv::Point& mousePos, double fps) {
+void drawTracks(cv::UMat& image, const Tracks& tracks, cv::Point& mousePos, double fps, bool paused) {
     for(const std::unique_ptr<Track>& track : tracks) {
         // Draw contour outline
         const Contour& contour = track->getContour();
@@ -83,10 +83,10 @@ void drawTracks(cv::UMat& image, const Tracks& tracks, cv::Point& mousePos, doub
         cv::Point labelPos(bbox.x + labelPad, bbox.y - labelPad - 1);
         cv::putText(image, labelText, labelPos, labelFont, labelScale, labelColor, labelFontThickness);
     }
-    // Draw FPS text
-    std::ostringstream fpsTextStream;
-    fpsTextStream << "FPS: " << std::fixed << std::setprecision(2) << fps;
-    cv::putText(image, fpsTextStream.str(), {0, image.rows - 8}, labelFont, labelScale, fpsColor);
+    // Draw frame info
+    std::ostringstream frameTextStream;
+    frameTextStream << "FPS: " << std::fixed << std::setprecision(2) << fps << (paused ? " [Paused]" : "");
+    cv::putText(image, frameTextStream.str(), {0, image.rows - 8}, labelFont, labelScale, fpsColor);
 }
 
 void mouseCallback(int event, int x, int y, int flags, void* data) {
@@ -113,7 +113,7 @@ Display::~Display() {
     //cv::destroyWindow(blobWinTitle);
 }
 
-void Display::showFrame(cv::UMat& frame, cv::UMat& maskImage, const Tracks& tracks) {
+void Display::showFrame(cv::UMat& frame, cv::UMat& maskImage, const Tracks& tracks, bool paused) {
     // Calculate FPS
     fps.update(cv::getTickCount());
     double fpsValue = fps.getFPS();
@@ -123,15 +123,15 @@ void Display::showFrame(cv::UMat& frame, cv::UMat& maskImage, const Tracks& trac
     // Convert 1-channel mask to BGR image
     cv::cvtColor(maskImage, rgbMaskImage, cv::COLOR_GRAY2BGR);
     // Display just the blob and track information
-    cv::UMat blobImage = rgbMaskImage.clone();
-    drawTracks(blobImage, tracks, mousePos, fpsValue);
+//     cv::UMat blobImage = rgbMaskImage.clone();
+//     drawTracks(blobImage, tracks, mousePos, fpsValue, paused);
 //     cv::imshow(blobWinTitle, blobImage);
 //     cv::resizeWindow(blobWinTitle,300,300);
     // Color the mask so it shows up better when overlaid
     rgbMaskImage.setTo(maskColor, maskImage);
     // Add the colored mask image as a semi-transparent overlay to the camera image
     cv::addWeighted(frame, 1.0, rgbMaskImage, 0.65, 0.0, buffer);
-    drawTracks(buffer, tracks, mousePos, fpsValue);
+    drawTracks(buffer, tracks, mousePos, fpsValue, paused);
     cv::imshow(imageWinTitle, buffer);
     cv::resizeWindow(imageWinTitle,300,300);
 }
