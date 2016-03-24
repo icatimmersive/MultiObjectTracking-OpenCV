@@ -16,6 +16,9 @@
 #include "Networking/blobSender.h"
 #include <opencv2/calib3d.hpp>
 
+const double targetFPS = 30.0;
+const double targetSleep = 1000.0 / targetFPS;
+
 void sendTracks(int cameraId, cv::Size imgSize, ObjectTracker* tracker, blobSender& sender) {
     Blob blobData;
     memset(&blobData, 0, sizeof(blobData));
@@ -129,7 +132,7 @@ int main(int argc, char *argv[]) {
             }
             display.showFrame(frame, tracker->getMaskImage(), tracker->getTracks(), paused);
             // Only the least-signficant byte is used, sometimes the rest is garbage so 0xFF is needed
-            int key = cv::waitKey(10) & 0xFF;
+            int key = cv::waitKey(targetSleep) & 0xFF;
             if(key == 27) { // Escape pressed
                 break;
             } else if(key == ' ') {
