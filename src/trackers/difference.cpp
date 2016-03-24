@@ -6,15 +6,15 @@
 #include <opencv2/video.hpp>
 #include <opencv2/bgsegm.hpp>
 
-const int skipFrames = 250;
-const double contourMinArea = 1200.0;
-const double contourMaxArea = 20000.0;
+const int skipFrames = 300;
+const double contourMinArea = 800.0;
+const double contourMaxArea = 30000.0;
 
 void smoothMask(cv::UMat& maskImage) {
     // Median filter for smoothing
     cv::medianBlur(maskImage, maskImage, 3); // MATLAB code uses medfilt2, which uses 3x3 aperture
     // Morphological operations to remove noise and fill in holes
-    cv::Mat kernel = cv::getStructuringElement(cv::MorphShapes::MORPH_ELLIPSE, cv::Size(14, 14));
+    cv::Mat kernel = cv::getStructuringElement(cv::MorphShapes::MORPH_ELLIPSE, cv::Size(6, 6));
     cv::morphologyEx(maskImage, maskImage, cv::MorphTypes::MORPH_OPEN, kernel);
     cv::morphologyEx(maskImage, maskImage, cv::MorphTypes::MORPH_DILATE, kernel);
 }
@@ -38,7 +38,7 @@ DifferenceTracker::~DifferenceTracker() {
 
 void DifferenceTracker::processFrame(cv::UMat& frame) {
     // third parameter = rate of background update (0.0 is no update)
-    diffEngine->apply(frame, maskImage, 0.0005);
+    diffEngine->apply(frame, maskImage, 0.0005); // should be 0.0005
     // Apply operations to improve mask image
     smoothMask(maskImage);
     // Now return if this frame should be skipped
