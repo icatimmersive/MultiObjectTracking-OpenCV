@@ -9,8 +9,8 @@
 #include "track.h"
 
 const int kdTreeLeafMax = 2;
-const int nnMaxResults = 4;
-const double nnSearchRadius = 20; // 20 pixels around contour edges
+const int nnMaxResults = 6;
+const double nnSearchRadius = 18; // Pixels around contour edges
 
 const int invisibleMax = 5;
 const double visibleThreshold = 0.6;
@@ -42,10 +42,11 @@ std::vector<Contour> combineContours(std::vector<Contour>& contours) {
 
     // Perform nearest-neighbor search on biggest blobs until none left
     cv::flann::KDTreeIndexParams indexParams(kdTreeLeafMax);
-    if(contours.size() > 1) {
+    std::cout << "FLANN start" << std::endl;
+    while(contoursCopy.size() > 1) {
         // Get last contour and data
         Contour& query = *contoursCopy.back();
-        cv::Point2f queryPoint = contourCenters.back();
+        cv::Point2f queryCenter = contourCenters.back();
         double queryRadius = contourRadii.back();
         contoursCopy.pop_back();
         contourCenters.pop_back();
@@ -53,34 +54,53 @@ std::vector<Contour> combineContours(std::vector<Contour>& contours) {
 
         // Build KD-tree
         // Default distance is L2 distance, which is not Eucidean, it is Euclidean squared
+        std::cout << "Query: " << queryCenter << std::endl;
+        std::cout << "Available contours: " << std::endl << contourCenters << std::endl;
         cv::flann::Index kdTree(cv::Mat(contourCenters).reshape(1), indexParams);
         std::vector<int> indices;
         std::vector<float> dists;
         // Find k nearest neighbors
-        kdTree.knnSearch(cv::Matx12f(queryPoint.x, queryPoint.y), indices, dists, nnMaxResults);
-        Contour combinedContour = query;
+        kdTree.knnSearch(cv::Matx12f(queryCenter.x, queryCenter.y), indices, dists, nnMaxResults);
         int total = std::min((int)contourCenters.size(), nnMaxResults);
-        std::cout << total << ": ";
+        std::vector<int> matchedIndices;
+        Contour combinedContour = query;
         for(int i = 0; i < total; i++) {
-            std::cout << indices[i];
+//             std::cout << indices[i];
             double distance = std::sqrt(dists[i]);
             // Estimate threshold distance between contours using radii of enclosing circles
             double nbrRadius = contourRadii[indices[i]];
             double maxDistance = queryRadius + nbrRadius + nnSearchRadius;
-            std::cout << "-(dist: " << distance << ", max: " << maxDistance << ")";
+//             std::cout << "-(dist: " << distance << ", max: " << maxDistance << ")";
             if(distance <= maxDistance) {
                 // If under threshold distance, then combine contours
-                std::cout << "-combine";
+//                 std::cout << "-combine";
+                matchedIndices.push_back(indices[i]);
                 Contour& nbrContour = *contoursCopy[indices[i]];
                 combinedContour.insert(combinedContour.end(), nbrContour.begin(), nbrContour.end());
             }
-            std::cout << ", ";
+//             std::cout << ", ";
         }
-        std::cout << std::endl;
+//         std::cout << std::endl;
 
+        // Add convex hull of combined contour to vector
         Contour combinedHull;
         cv::convexHull(combinedContour, combinedHull);
         combined.push_back(combinedHull);
+
+        // Remove contour and data from vectors
+        // TODO more efficient multiple-index deletion
+        std::sort(matchedIndices.begin(), matchedIndices.end(), std::greater<int>());
+        for(int i : matchedIndices) {
+            contoursCopy.erase(contoursCopy.begin() + i);
+            contourCenters.erase(contourCenters.begin() + i);
+            contourRadii.erase(contourRadii.begin() + i);
+        }
+    }
+    std::cout << "FLANN finished" << std::endl << std::endl;
+
+    // Add last remaining contour if it exists
+    if(contoursCopy.size() > 0) {
+        combined.push_back(*contoursCopy.back());
     }
 
     return combined;
@@ -119,7 +139,7 @@ void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contou
 
     std::vector<Contour> combinedContours = combineContours(contours);
     contours = combinedContours;
-    
+
     // Assign contours to existing tracks
     Track::assignTracks(tracks, contours);
     // Create new tracks for unassigned contours
