@@ -9,11 +9,12 @@
 #include "track.h"
 
 const int kdTreeLeafMax = 2;
-const int nnMaxResults = 6;
-const double nnSearchRadius = 18; // Pixels around contour edges
+const int nnMaxResults = 4;
+const double nnSearchRadius = 8; // Pixels around contour edges
 
 const int invisibleMax = 5;
 const double visibleThreshold = 0.6;
+const cv::Point origin(900, 0);
 
 bool isTrackLost(std::unique_ptr<Track>& track) {
     double visiblePercent = track->getVisibleCount() * 1.0 / track->getAge();
@@ -42,7 +43,7 @@ std::vector<Contour> combineContours(std::vector<Contour>& contours) {
 
     // Perform nearest-neighbor search on biggest blobs until none left
     cv::flann::KDTreeIndexParams indexParams(kdTreeLeafMax);
-    std::cout << "FLANN start" << std::endl;
+    //std::cout << "FLANN start" << std::endl;
     while(contoursCopy.size() > 1) {
         // Get last contour and data
         Contour& query = *contoursCopy.back();
@@ -54,8 +55,8 @@ std::vector<Contour> combineContours(std::vector<Contour>& contours) {
 
         // Build KD-tree
         // Default distance is L2 distance, which is not Eucidean, it is Euclidean squared
-        std::cout << "Query: " << queryCenter << std::endl;
-        std::cout << "Available contours: " << std::endl << contourCenters << std::endl;
+      //  std::cout << "Query: " << queryCenter << std::endl;
+       // std::cout << "Available contours: " << std::endl << contourCenters << std::endl;
         cv::flann::Index kdTree(cv::Mat(contourCenters).reshape(1), indexParams);
         std::vector<int> indices;
         std::vector<float> dists;
@@ -96,7 +97,7 @@ std::vector<Contour> combineContours(std::vector<Contour>& contours) {
             contourRadii.erase(contourRadii.begin() + i);
         }
     }
-    std::cout << "FLANN finished" << std::endl << std::endl;
+   /// std::cout << "FLANN finished" << std::endl << std::endl;
 
     // Add last remaining contour if it exists
     if(contoursCopy.size() > 0) {
@@ -143,7 +144,14 @@ void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contou
     // Assign contours to existing tracks
     Track::assignTracks(tracks, contours);
     // Create new tracks for unassigned contours
+
     for(Contour& contour : contours) {
-        tracks.emplace_back(new Track(contour));
+     //   cv::Point center = calcCentroid(contour);
+     //   cv::Point diff = center - origin;
+     //   double dist = std::sqrt(diff.x * diff.x + diff.y * diff.y);
+       // if(dist < 200) {
+            tracks.emplace_back(new Track(contour));
+       // }
+
     }
 }
