@@ -83,3 +83,47 @@ cameras:
       class: vivotek
       ip: '192.168.1.20'
       crop: [180, 250, 750, 726]
+
+    - id: 14
+      name: hallwayF
+      desc: Hallway F
+      class: oncam
+      ip: '192.168.1.44'
+      crop: [130, 260, 800, 550]
+
+    - id: 15
+      name: hallwayG
+      desc: Hallway G
+      class: oncam
+      ip: '192.168.1.45'
+      crop: [500, 150, 1100, 700]
+
+    - id: 16
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.46'
+      crop: [130, 260, 800, 550]
+
+    - id: 17
+      name: hallwayI
+      desc: Hallway I
+      class: oncam
+      ip: '192.168.1.47'
+      crop: [130, 200, 800, 570]
+
+    - id: 18
+      name: hallwayJ
+      desc: Hallway J
+      class: oncam
+      ip: '192.168.1.48'
+      crop: [130, 260, 800, 560]
+
+    - id: 19
+      name: hallwayK
+      desc: Hallway K
+      class: vivotek
+      ip: '192.168.1.49'
+      crop: [180, 150, 750, 650]
+
+    
