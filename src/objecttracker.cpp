@@ -55,8 +55,6 @@ std::vector<Contour> combineContours(std::vector<Contour>& contours) {
 
         // Build KD-tree
         // Default distance is L2 distance, which is not Eucidean, it is Euclidean squared
-      //  std::cout << "Query: " << queryCenter << std::endl;
-       // std::cout << "Available contours: " << std::endl << contourCenters << std::endl;
         cv::flann::Index kdTree(cv::Mat(contourCenters).reshape(1), indexParams);
         std::vector<int> indices;
         std::vector<float> dists;
@@ -66,22 +64,17 @@ std::vector<Contour> combineContours(std::vector<Contour>& contours) {
         std::vector<int> matchedIndices;
         Contour combinedContour = query;
         for(int i = 0; i < total; i++) {
-//             std::cout << indices[i];
             double distance = std::sqrt(dists[i]);
             // Estimate threshold distance between contours using radii of enclosing circles
             double nbrRadius = contourRadii[indices[i]];
             double maxDistance = queryRadius + nbrRadius + nnSearchRadius;
-//             std::cout << "-(dist: " << distance << ", max: " << maxDistance << ")";
             if(distance <= maxDistance) {
                 // If under threshold distance, then combine contours
-//                 std::cout << "-combine";
                 matchedIndices.push_back(indices[i]);
                 Contour& nbrContour = *contoursCopy[indices[i]];
                 combinedContour.insert(combinedContour.end(), nbrContour.begin(), nbrContour.end());
             }
-//             std::cout << ", ";
         }
-//         std::cout << std::endl;
 
         // Add convex hull of combined contour to vector
         Contour combinedHull;
@@ -97,7 +90,6 @@ std::vector<Contour> combineContours(std::vector<Contour>& contours) {
             contourRadii.erase(contourRadii.begin() + i);
         }
     }
-   /// std::cout << "FLANN finished" << std::endl << std::endl;
 
     // Add last remaining contour if it exists
     if(contoursCopy.size() > 0) {
@@ -130,7 +122,10 @@ void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contou
     // TODO delete with heuristics
     for(auto it = tracks.begin(); it != tracks.end();) {
         std::unique_ptr<Track>& track = *it;
-        if(isTrackLost(track)) {
+        cv::Point center = track->getPrediction();
+        cv::Point diff = center - origin;
+        double dist = std::sqrt(diff.x * diff.x + diff.y * diff.y);
+        if(isTrackLost(track) && dist < 200) {
             deletedTracks.insert(track->getId());
             it = tracks.erase(it);
         } else {
@@ -143,15 +138,14 @@ void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contou
 
     // Assign contours to existing tracks
     Track::assignTracks(tracks, contours);
+
     // Create new tracks for unassigned contours
-
     for(Contour& contour : contours) {
-     //   cv::Point center = calcCentroid(contour);
-     //   cv::Point diff = center - origin;
-     //   double dist = std::sqrt(diff.x * diff.x + diff.y * diff.y);
-       // if(dist < 200) {
+        cv::Point center = calcCentroid(contour);
+        cv::Point diff = center - origin;
+        double dist = std::sqrt(diff.x * diff.x + diff.y * diff.y);
+        if(dist < 200) {
             tracks.emplace_back(new Track(contour));
-       // }
-
+        }
     }
 }
