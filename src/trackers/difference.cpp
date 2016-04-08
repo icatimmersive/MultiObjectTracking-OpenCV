@@ -8,7 +8,7 @@
 
 const int skipFrames = 300;
 const double contourMinArea = 800.0;
-const double contourMaxArea = 30000.0;
+const double contourMaxArea = 50000.0;
 
 void smoothMask(cv::UMat& maskImage) {
     // Median filter for smoothing
