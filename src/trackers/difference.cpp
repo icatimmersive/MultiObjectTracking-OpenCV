@@ -36,9 +36,9 @@ DifferenceTracker::DifferenceTracker() : skipped(0) {
 DifferenceTracker::~DifferenceTracker() {
 }
 
-void DifferenceTracker::processFrame(cv::UMat& frame) {
+void DifferenceTracker::processFrame(cv::UMat& frame, Spawns& spawns) {
     // third parameter = rate of background update (0.0 is no update)
-    diffEngine->apply(frame, maskImage, 0.0005); // should be 0.0005
+    diffEngine->apply(frame, maskImage, 0.005); // should be 0.0005
     // Apply operations to improve mask image
     smoothMask(maskImage);
     // Now return if this frame should be skipped
@@ -52,5 +52,5 @@ void DifferenceTracker::processFrame(cv::UMat& frame) {
     // RETR_EXTENRAL = find outermost contours, CHAIN_APPROX_SIMPLE = approximate lines to reduce number of points
     cv::findContours(maskImageCopy, contours, cv::RetrievalModes::RETR_EXTERNAL, cv::ContourApproximationModes::CHAIN_APPROX_SIMPLE);
     contours.erase(std::remove_if(contours.begin(), contours.end(), std::not1(std::ref(contourFilter))), contours.end());
-    processContours(tracks, contours);
+    processContours(tracks, contours, spawns);
 }

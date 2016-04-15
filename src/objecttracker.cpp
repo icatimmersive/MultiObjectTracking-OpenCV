@@ -14,11 +14,24 @@ const double nnSearchRadius = 8; // Pixels around contour edges
 
 const int invisibleMax = 5;
 const double visibleThreshold = 0.6;
-const cv::Point origin(900, 0);
 
-bool isTrackLost(std::unique_ptr<Track>& track) {
+bool isTrackLost(const std::unique_ptr<Track>& track) {
     double visiblePercent = track->getVisibleCount() * 1.0 / track->getAge();
     return (visiblePercent < visibleThreshold || track->getInvisibleAge() > invisibleMax);
+}
+
+bool inSpawnRegion(const cv::Point& center, const Spawns& spawns) {
+    // Return true automatically if no spawn regions defined for camera
+    if(spawns.size() == 0) {
+        return true;
+    }
+
+    for(const cv::Rect& spawn : spawns) {
+        if(spawn.contains(center)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // Using FLANN to group contours together by centroid
@@ -116,16 +129,13 @@ cv::UMat& ObjectTracker::getMaskImage() {
     return maskImage;
 }
 
-void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contours) {
+void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contours, Spawns& spawns) {
     // Delete lost tracks:
     // Tracks that are too sporadically visible, or have been invisible for too long
     // TODO delete with heuristics
     for(auto it = tracks.begin(); it != tracks.end();) {
         std::unique_ptr<Track>& track = *it;
-        cv::Point center = track->getPrediction();
-        cv::Point diff = center - origin;
-        double dist = std::sqrt(diff.x * diff.x + diff.y * diff.y);
-        if(isTrackLost(track) && dist < 200) {
+        if(isTrackLost(track) && inSpawnRegion(track->getPrediction(), spawns)) {
             deletedTracks.insert(track->getId());
             it = tracks.erase(it);
         } else {
@@ -142,9 +152,7 @@ void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contou
     // Create new tracks for unassigned contours
     for(Contour& contour : contours) {
         cv::Point center = calcCentroid(contour);
-        cv::Point diff = center - origin;
-        double dist = std::sqrt(diff.x * diff.x + diff.y * diff.y);
-        if(dist < 200) {
+        if(inSpawnRegion(center, spawns)) {
             tracks.emplace_back(new Track(contour));
         }
     }

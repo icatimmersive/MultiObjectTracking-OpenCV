@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
                     break;
                 }
                 //cv::cvtColor(frame,frame,CV_BGR2HSV); // Convert to HSV to eliminate shadows
-                tracker->processFrame(frame);
+                tracker->processFrame(frame, camera.getSpawns());
                 sendTracks(id, {frame.cols, frame.rows}, tracker, sender);
             }
             display.showFrame(frame, tracker->getMaskImage(), tracker->getTracks(), paused);
