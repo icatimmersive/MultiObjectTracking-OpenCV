@@ -1,8 +1,11 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
+
+typedef std::vector<cv::Rect> Spawns;
 
 class Camera {
 public:
@@ -10,10 +13,12 @@ public:
 
     int getId();
     bool getFrame(cv::UMat& frame);
+    Spawns& getSpawns();
 
 private:
     int id;
     cv::VideoCapture video;
     cv::Rect crop;
-    bool cropping;
+    Spawns spawns;
+    bool camDefined;
 };

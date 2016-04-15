@@ -3,10 +3,11 @@
 
 Camera::Camera(int id, std::string url) : id(id), video(url) {
     Config& config = Config::get();
-    cropping = config.isCameraDefined(id);
-    if(cropping) {
+    camDefined = config.isCameraDefined(id);
+    if(camDefined) {
         CameraInfo camInfo = config.getCameraInfo(id);
         crop = camInfo.crop;
+        spawns = camInfo.spawns;
     }
 }
 
@@ -19,8 +20,12 @@ bool Camera::getFrame(cv::UMat& frame) {
     if(!status) {
         return false;
     }
-    if(cropping) {
+    if(camDefined) {
         frame = frame(crop);
     }
     return true;
+}
+
+Spawns& Camera::getSpawns() {
+    return spawns;
 }

@@ -1,8 +1,10 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <unordered_map>
 #include <opencv2/core.hpp>
+#include "camera.h"
 
 struct CameraClass {
     std::string name;
@@ -18,6 +20,7 @@ struct CameraInfo {
     std::string className;
     std::string ip;
     cv::Rect crop;
+    Spawns spawns;
 };
 
 class Config {
