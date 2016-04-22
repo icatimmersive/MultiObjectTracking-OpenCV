@@ -43,6 +43,7 @@ bool Sender::writeDataToServer(std::string data)
     int n = send(sockfd, data.c_str(), strlen(data.c_str()),0);
     if(n < 0) {
         perror("ERROR writing to socket");
+        close(sockfd);
         sockfd = -1;
         return false;
     }
