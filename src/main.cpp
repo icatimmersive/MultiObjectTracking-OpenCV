@@ -113,6 +113,7 @@ int main(int argc, char *argv[]) {
 
     // Initialize system objects
     Camera camera(id, url);
+    const Spawns& spawns = camera.getSpawns();
     Display display(id);
     ObjectTracker* tracker = new DifferenceTracker();
     blobSender sender(serverURL.c_str(), serverPort); // set up networking
@@ -127,10 +128,10 @@ int main(int argc, char *argv[]) {
                     break;
                 }
                 //cv::cvtColor(frame,frame,CV_BGR2HSV); // Convert to HSV to eliminate shadows
-                tracker->processFrame(frame, camera.getSpawns());
+                tracker->processFrame(frame, spawns);
                 sendTracks(id, {frame.cols, frame.rows}, tracker, sender);
             }
-            display.showFrame(frame, tracker->getMaskImage(), tracker->getTracks(), paused);
+            display.showFrame(frame, tracker->getMaskImage(), tracker->getTracks(), spawns, paused);
             // Only the least-signficant byte is used, sometimes the rest is garbage so 0xFF is needed
             int key = cv::waitKey(targetSleep) & 0xFF;
             if(key == 27) { // Escape pressed

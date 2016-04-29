@@ -30,6 +30,7 @@ void Track::assignTracks(Tracks& tracks, std::vector<Contour>& contours) {
                 minIndex = i;
             }
         }
+
         if(minIndex == -1) {
             // No contour found, so track becomes invisible
             track->update();

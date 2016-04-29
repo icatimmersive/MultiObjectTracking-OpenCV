@@ -4,13 +4,14 @@
 #include <string>
 #include <opencv2/core/mat.hpp>
 #include "track.h"
+#include "camera.h"
 
 class Display {
 public:
     Display(int cameraId);
     ~Display();
 
-    void showFrame(cv::UMat& frame, cv::UMat& maskImage, const Tracks& tracks, bool paused);
+    void showFrame(cv::UMat& frame, cv::UMat& maskImage, const Tracks& tracks, const Spawns& spawns, bool paused);
 
 private:
     class FPS {

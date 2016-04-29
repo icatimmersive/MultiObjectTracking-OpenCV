@@ -11,6 +11,7 @@
 const int kdTreeLeafMax = 2;
 const int nnMaxResults = 4;
 const double nnSearchRadius = 8; // Pixels around contour edges
+const double minCombinedArea = 1000.0;
 
 const int invisibleMax = 5;
 const double visibleThreshold = 0.6;
@@ -92,7 +93,9 @@ std::vector<Contour> combineContours(std::vector<Contour>& contours) {
         // Add convex hull of combined contour to vector
         Contour combinedHull;
         cv::convexHull(combinedContour, combinedHull);
-        combined.push_back(combinedHull);
+        if(cv::contourArea(combinedContour) > minCombinedArea) {
+            combined.push_back(combinedHull);
+        }
 
         // Remove contour and data from vectors
         // TODO more efficient multiple-index deletion
@@ -129,7 +132,7 @@ cv::UMat& ObjectTracker::getMaskImage() {
     return maskImage;
 }
 
-void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contours, Spawns& spawns) {
+void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contours, const Spawns& spawns) {
     // Delete lost tracks:
     // Tracks that are too sporadically visible, or have been invisible for too long
     // TODO delete with heuristics

@@ -36,9 +36,9 @@ DifferenceTracker::DifferenceTracker() : skipped(0) {
 DifferenceTracker::~DifferenceTracker() {
 }
 
-void DifferenceTracker::processFrame(cv::UMat& frame, Spawns& spawns) {
+void DifferenceTracker::processFrame(cv::UMat& frame, const Spawns& spawns) {
     // third parameter = rate of background update (0.0 is no update)
-    diffEngine->apply(frame, maskImage, 0.005); // should be 0.0005
+    diffEngine->apply(frame, maskImage, 0.0005); // should be 0.0005
     // Apply operations to improve mask image
     smoothMask(maskImage);
     // Now return if this frame should be skipped

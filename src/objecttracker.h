@@ -10,7 +10,7 @@ class ObjectTracker {
 public:
     virtual ~ObjectTracker();
 
-    virtual void processFrame(cv::UMat& frame, Spawns& spawns) = 0;
+    virtual void processFrame(cv::UMat& frame, const Spawns& spawns) = 0;
     const Tracks& getTracks();
     // Will clear the list of deleted tracks, so subsequent calls return an empty list.
     const std::unordered_set<int> getDeletedTracks();
@@ -21,5 +21,5 @@ protected:
     std::unordered_set<int> deletedTracks;
     cv::UMat maskImage;
 
-    void processContours(Tracks& tracks, std::vector<Contour>& contours, Spawns& spawns);
+    void processContours(Tracks& tracks, std::vector<Contour>& contours, const Spawns& spawns);
 };
