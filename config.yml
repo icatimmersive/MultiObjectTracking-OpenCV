@@ -4,7 +4,8 @@ server:
     port: 9999
 
 classes:
-    # oncam image size should be 1056x960
+    # oncam image size should be 1056x960, but make sure to
+    # take cropping into account for spawn regions
     oncam:
         username: admin
         password: admin
@@ -22,7 +23,7 @@ cameras:
       ip: '192.168.1.14'
       crop: [100, 100, 900, 700]
       spawns:
-        - [760, 115, 250, 240]
+        - [690, 40, 160, 180]
 
     - id: 2
       name: learningA
