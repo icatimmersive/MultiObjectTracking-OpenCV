@@ -61,6 +61,11 @@ double Display::FPS::getFPS() {
 // Display
 
 void drawTracks(cv::UMat& image, const Tracks& tracks, cv::Point& mousePos, const Spawns& spawns, double fps, bool paused) {
+    // Draw spawn regions
+    for(const cv::Rect& spawn : spawns) {
+        cv::rectangle(image, spawn.tl(), spawn.br(), spawnColor, spawnThickness);
+    }
+
     // Draw tracks
     for(const std::unique_ptr<Track>& track : tracks) {
         // Draw contour outline
@@ -90,11 +95,6 @@ void drawTracks(cv::UMat& image, const Tracks& tracks, cv::Point& mousePos, cons
         // - Draw label text
         cv::Point labelPos(bbox.x + labelPad, bbox.y - labelPad - 1);
         cv::putText(image, labelText, labelPos, labelFont, labelScale, labelColor, labelFontThickness);
-    }
-
-    // Draw spawn regions
-    for(const cv::Rect& spawn : spawns) {
-        cv::rectangle(image, spawn.tl(), spawn.br(), spawnColor, spawnThickness);
     }
 
     // Draw frame info
