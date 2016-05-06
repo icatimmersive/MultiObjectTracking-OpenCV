@@ -18,15 +18,15 @@
 class Sender {
 public:
     Sender(const char *hostName, int portNumber);
-    int writeDataToServer(std::string data);
+    bool writeDataToServer(std::string data);
 
 
 private:
     int portNumber;
+    int sockfd;
+    int portno;
+    sockaddr_in serv_addr;
+    hostent *server;
 
-    int sockfd, portno ;
-    struct sockaddr_in serv_addr;
-    struct hostent *server;
-
-
+    bool reconnect();
 };
