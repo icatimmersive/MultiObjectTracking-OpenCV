@@ -11,7 +11,8 @@
 const int kdTreeLeafMax = 2;
 const int nnMaxResults = 4;
 const double nnSearchRadius = 8; // Pixels around contour edges
-const double minCombinedArea = 1000.0;
+const double minCombinedArea = 2000.0;
+const double maxCombinedArea = 15000.0;
 
 const int invisibleMax = 5;
 const double visibleThreshold = 0.6;
@@ -83,9 +84,13 @@ std::vector<Contour> combineContours(std::vector<Contour>& contours) {
             double nbrRadius = contourRadii[indices[i]];
             double maxDistance = queryRadius + nbrRadius + nnSearchRadius;
             if(distance <= maxDistance) {
+                Contour& nbrContour = *contoursCopy[indices[i]];
+                // Keep combined contour under max area
+                if(cv::contourArea(combinedContour) + cv::contourArea(nbrContour) > maxCombinedArea) {
+                    break;
+                }
                 // If under threshold distance, then combine contours
                 matchedIndices.push_back(indices[i]);
-                Contour& nbrContour = *contoursCopy[indices[i]];
                 combinedContour.insert(combinedContour.end(), nbrContour.begin(), nbrContour.end());
             }
         }
@@ -93,7 +98,7 @@ std::vector<Contour> combineContours(std::vector<Contour>& contours) {
         // Add convex hull of combined contour to vector
         Contour combinedHull;
         cv::convexHull(combinedContour, combinedHull);
-        if(cv::contourArea(combinedContour) > minCombinedArea) {
+        if(cv::contourArea(combinedHull) > minCombinedArea) {
             combined.push_back(combinedHull);
         }
 
