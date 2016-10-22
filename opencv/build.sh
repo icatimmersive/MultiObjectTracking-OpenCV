@@ -18,6 +18,10 @@ function echoE() {
 
 CONTRIBS="bgsegm"
 CMAKE_OPTIONS="-DCMAKE_BUILD_TYPE=Release -DWITH_QT=ON -DWITH_OPENGL=ON"
+# Uncomment if compiling fails because gcc version too new
+#CMAKE_OPTIONS="${CMAKE_OPTIONS} -DCUDA_HOST_COMPILER=/usr/bin/gcc-4.9 -DENABLE_PRECOMPILED_HEADERS=OFF"
+# Uncomment to speed up CUDA for specific architecure, need to update with actual GPU architecture version
+#CMAKE_OPTIONS="${CMAKE_OPTIONS} -DCUDA_ARCH_PTX= -DCUDA_ARCH_BIN=5.2"
 CMAKE_CONTRIB_OPTIONS="-DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules"
 CMAKE_SAMPLES="-DBUILD_EXAMPLES=ON -DINSTALL_C_EXAMPLES=ON -DINSTALL_PYTHON_EXAMPLES=ON"
 PACKAGES="git cmake build-essential qt5-default python-dev python3-dev python-numpy python3-numpy default-jdk default-jre ant libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libv4l-dev"
@@ -125,14 +129,26 @@ echo1 "\nPreparing OpenCV build..."
 cd opencv
 mkdir build
 cd build
-cmake $CMAKE_OPTIONS ..
+
+if [ -e "`which ninja`" ]; then
+	NINJA="-G Ninja"
+else
+	NINJA=""
+fi
+cmake $CMAKE_OPTIONS $NINJA ..
 
 echo1 "\nPress [ENTER] to begin building"
 if [ "x$NONINT" != "xy" ]; then
 	read
 fi
-NUMCPUS=`grep -c '^processor' /proc/cpuinfo`
-make -j$NUMCPUS
+
+if [ "x$NINJA" == "x" ]; then
+	NUMCPUS=`grep -c '^processor' /proc/cpuinfo`
+	make -j$NUMCPUS
+else
+	ninja
+fi
+
 if [ "x$?" != "x0" ]; then
 	echoE "Error building OpenCV"
 	exit
