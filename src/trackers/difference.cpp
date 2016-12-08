@@ -52,5 +52,5 @@ void DifferenceTracker::processFrame(cv::UMat& frame, const Spawns& spawns) {
     // RETR_EXTENRAL = find outermost contours, CHAIN_APPROX_SIMPLE = approximate lines to reduce number of points
     cv::findContours(maskImageCopy, contours, cv::RetrievalModes::RETR_EXTERNAL, cv::ContourApproximationModes::CHAIN_APPROX_SIMPLE);
     contours.erase(std::remove_if(contours.begin(), contours.end(), std::not1(std::ref(contourFilter))), contours.end());
-    processContours(tracks, contours, spawns);
+    processContours(tracks, contours, spawns,tracks_sec);
 }

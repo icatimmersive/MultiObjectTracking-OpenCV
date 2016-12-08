@@ -16,11 +16,14 @@ const double maxCombinedArea = 15000.0;
 
 const int invisibleMax = 5;
 const double visibleThreshold = 0.6;
-
+const double staticLostBlobThresh = 0.01;
+int countInitialStart=0;
+bool sec_flag = false;
 bool isTrackLost(const std::unique_ptr<Track>& track) {
     double visiblePercent = track->getVisibleCount() * 1.0 / track->getAge();
     return (visiblePercent < visibleThreshold || track->getInvisibleAge() > invisibleMax);
 }
+
 
 bool inSpawnRegion(const cv::Point& center, const Spawns& spawns) {
     // Return true automatically if no spawn regions defined for camera
@@ -130,6 +133,7 @@ const Tracks& ObjectTracker::getTracks() {
 const std::unordered_set<int> ObjectTracker::getDeletedTracks() {
     std::unordered_set<int> copy(deletedTracks);
     deletedTracks.clear();
+    deletedTracks_sec.clear();
     return copy;
 }
 
@@ -137,7 +141,7 @@ cv::UMat& ObjectTracker::getMaskImage() {
     return maskImage;
 }
 
-void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contours, const Spawns& spawns) {
+void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contours, const Spawns& spawns, Tracks& tracks_sec) {
     // Delete lost tracks:
     // Tracks that are too sporadically visible, or have been invisible for too long
     // TODO delete with heuristics
@@ -149,6 +153,22 @@ void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contou
         } else {
             it++;
         }
+        /*double visiblePercent = track->getVisibleCount() * 1.0 / track->getAge();
+        if(visiblePercent < staticLostBlobThresh)
+            std::cout<<visiblePercent<<std::endl;*/
+    }
+    if(sec_flag)
+    {
+        //Delete the Tracks those have been invisible for too long from the secondary tracks 
+        for(auto it = tracks_sec.begin(); it != tracks_sec.end();) {
+            std::unique_ptr<Track>& track = *it;
+            if(isTrackLost(track)) {
+                deletedTracks_sec.insert(track->getId());
+                it = tracks_sec.erase(it);
+            } else {
+                it++;
+            }
+        }
     }
 
     std::vector<Contour> combinedContours = combineContours(contours);
@@ -156,7 +176,19 @@ void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contou
 
     // Assign contours to existing tracks
     Track::assignTracks(tracks, contours);
-
+    if(sec_flag)
+    {
+        // Create new tracks for unassigned contours for all blobs i.e irrespective of the spawn region heuristics 
+        for(Contour& contour : contours) {
+            cv::Point center = calcCentroid(contour);
+            tracks_sec.emplace_back(new Track(contour));
+        }
+    }
+   /* for(auto it = tracks_sec.begin(); it != tracks_sec.end();)
+    {
+        std::unique_ptr<Track>& track_sec = *it;
+        std::cout<<"secondary Countour visible count"<<"\t"<<track_sec->getVisibleCount()<<std::endl;
+    }*/
     // Create new tracks for unassigned contours
     for(Contour& contour : contours) {
         cv::Point center = calcCentroid(contour);
@@ -164,4 +196,8 @@ void ObjectTracker::processContours(Tracks& tracks, std::vector<Contour>& contou
             tracks.emplace_back(new Track(contour));
         }
     }
+    if(!sec_flag)
+        countInitialStart++;
+    if(countInitialStart>600)
+        sec_flag = true;
 }
