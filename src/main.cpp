@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
         url = getURL(id);
     } else {
         id = std::atoi(argv[1]);
-        url = parseURL(id, argv[2]);
+        url = parseURL(id, argv[2]);	//argv[2]; //
     }
 
     // Initialize system objects

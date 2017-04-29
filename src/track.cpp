@@ -29,22 +29,18 @@ void Track::assignTracks(Tracks& tracks, std::vector<Contour>& contours) {
         int minIndex = -1;
         for(int i = 0; i < contours.size(); i++) {
             double cost = getAssignCost(track, contours[i]);
-            std::cout<<"Cost"<<"\t"<<cost<<std::endl;    
+            //std::cout<<"Cost"<<"\t"<<cost<<std::endl;    
             if(cost <= minCost && cost !=0) {
                 minCost = cost;
                 minIndex = i;
             }
-            if(costChangeAssignment<cost && track->getAge() > ageChangeAssignment)
-            {
-                minIndex = i;
-            }
         }
-        std::cout<<"age of track"<<"\t"<<track->getAge()<<std::endl;
-        if(contours.size()==0 && track->getAge() > ageTrackDelete)
+        //std::cout<<"age of track"<<"\t"<<track->getAge()<<std::endl;
+        /*if(contours.size()==0 && track->getAge() > ageTrackDelete)
         {
             tracks.erase(tracks.begin()+trackno);
             break;
-        }
+        }*/
 
         if(minIndex == -1) {
             // No contour found, so track becomes invisible
@@ -53,7 +49,7 @@ void Track::assignTracks(Tracks& tracks, std::vector<Contour>& contours) {
             track->update(contours[minIndex]);
             contours.erase(contours.begin() + minIndex);
         }
-        std::cout<<"Counter Size"<<"\t"<<contours.size()<<std::endl;
+        //std::cout<<"Counter Size"<<"\t"<<contours.size()<<std::endl;
         trackno++;
     }
 }

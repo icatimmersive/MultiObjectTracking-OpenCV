@@ -14,7 +14,7 @@ cv::Point calcCentroid(Contour& contour);
 
 class Track {
 public:
-    static const int costNonassignment = 100;
+    static const int costNonassignment = 300;
     static const int costChangeAssignment = 200;
     static const int ageChangeAssignment = 100;
     static const int ageTrackDelete = 1000;

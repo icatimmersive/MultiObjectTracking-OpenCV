@@ -20,8 +20,7 @@ protected:
     Tracks tracks;
     Tracks tracks_sec;
     std::unordered_set<int> deletedTracks;
-    std::unordered_set<int> deletedTracks_sec;
     cv::UMat maskImage;
 
-    void processContours(Tracks& tracks, std::vector<Contour>& contours, const Spawns& spawns,Tracks& tracks_sec);
+    void processContours(Tracks& tracks, std::vector<Contour>& contours, const Spawns& spawns);
 };
