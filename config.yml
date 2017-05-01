@@ -1,6 +1,6 @@
 %YAML:1.0
 server:
-    url: dev.mirrorworlds.icat.vt.edu
+    url: mw.icat.vt.edu
     port: 9999
 
 classes:
