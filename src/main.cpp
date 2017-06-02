@@ -67,11 +67,23 @@ std::string parseURL(int camId, std::string arg) {
         Config& config = Config::get();
         if(config.isCameraDefined(camId)) {
             CameraInfo camInfo = config.getCameraInfo(camId);
+	    std::string url;
+	    if(camInfo.className=="TLOSoncam")
+	    {
+				CameraClass classInfo = config.getCameraClassInfo(camInfo.className);
+            	std::cout << "Using camera " << camId << " (" << camInfo.description << ")" << std::endl;
+            	url = "rtsp://";
+            	url += classInfo.username + ":" + classInfo.password + "@";
+           		url += arg + ":8555/" + classInfo.path;
+				std::cout<<url<<std::endl;
+	    }
+	    else{
             CameraClass classInfo = config.getCameraClassInfo(camInfo.className);
             std::cout << "Using camera " << camId << " (" << camInfo.description << ")" << std::endl;
-            std::string url("http://");
+            url = "http://";
             url += classInfo.username + ":" + classInfo.password + "@";
             url += arg + "/" + classInfo.path;
+	    }
             return url;
         } else {
             std::cout << "Using camera at address " << arg << std::endl;

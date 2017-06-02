@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <functional>
 #include <opencv2/video.hpp>
-#include <opencv2/bgsegm.hpp>
+//#include <opencv2/bgsegm.hpp>
 
 const int skipFrames = 300;
 const double contourMinArea = 800.0;

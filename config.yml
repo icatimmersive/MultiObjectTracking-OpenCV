@@ -13,6 +13,10 @@ classes:
         password: admin
         path: video.mjpg
 
+    TLOSoncam:
+        username: admin
+        password: admin
+        path: video.sdp?name=MJPEG
 cameras:
     - id: 1
       name: observation
@@ -247,4 +251,12 @@ cameras:
       class: oncam
       ip: '192.168.1.39'
       crop: [250, 200, 530, 550]
+
+    - id: 52
+      name: TLOS observation room
+      desc: TLOS observation room
+      class: TLOSoncam
+      ip: '192.168.1.50'
+      crop: [100, 200, 700, 650]
+      ang: -90
 
