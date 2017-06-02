@@ -84,11 +84,67 @@ cameras:
       ip: '192.168.1.20'
       crop: [180, 250, 750, 726]
 
+    - id: 12
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.41'
+      crop: [130, 70, 800, 700]
+
+    - id: 13
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.42'
+      crop: [130, 70, 800, 700]
+
+    - id: 14
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.43'
+      crop: [130, 70, 800, 700]
+
+    - id: 15
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.44'
+      crop: [130, 70, 800, 700]
+
     - id: 16
       name: hallwayH
       desc: Hallway H
       class: oncam
+      ip: '192.168.1.45'
+      crop: [130, 70, 800, 700]
+
+    - id: 17
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
       ip: '192.168.1.46'
+      crop: [130, 70, 800, 700]
+
+    - id: 18
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.47'
+      crop: [130, 70, 800, 700]
+
+    - id: 19
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.48'
+      crop: [130, 70, 800, 700]
+
+    - id: 20
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.49'
       crop: [130, 70, 800, 700]
 
     - id: 21
