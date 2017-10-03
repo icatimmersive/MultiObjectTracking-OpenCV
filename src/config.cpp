@@ -12,8 +12,16 @@ Config::Config(std::string filename) : file(filename, cv::FileStorage::READ) {
                            node["desc"],
                            node["class"],
                            node["ip"],
-                           {}};
+                           {}, {}};
         node["crop"] >> info.crop;
+        // Check if spawn regions are defined for this camera
+        cv::FileNode sNode = node["spawns"];
+        if(sNode.isSeq()) {
+            info.spawns.resize(sNode.size());
+            for(int i = 0; i < sNode.size(); i++) {
+                sNode[i] >> info.spawns[i];
+            }
+        }
         cameras[id] = info;
     }
 }

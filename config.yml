@@ -1,6 +1,6 @@
 %YAML:1.0
 server:
-    url: dev.mirrorworlds.icat.vt.edu
+    url: mw.icat.vt.edu
     port: 9999
 
 classes:
@@ -13,6 +13,10 @@ classes:
         password: admin
         path: video.mjpg
 
+    TLOSoncam:
+        username: admin
+        password: admin
+        path: video.sdp?name=MJPEG
 cameras:
     - id: 1
       name: observation
@@ -83,3 +87,176 @@ cameras:
       class: vivotek
       ip: '192.168.1.20'
       crop: [180, 250, 750, 726]
+
+    - id: 12
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.41'
+      crop: [130, 70, 800, 700]
+
+    - id: 13
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.42'
+      crop: [130, 70, 800, 700]
+
+    - id: 14
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.43'
+      crop: [130, 70, 800, 700]
+
+    - id: 15
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.44'
+      crop: [130, 70, 800, 700]
+
+    - id: 16
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.45'
+      crop: [130, 70, 800, 700]
+
+    - id: 17
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.46'
+      crop: [130, 70, 800, 700]
+
+    - id: 18
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.47'
+      crop: [130, 70, 800, 700]
+
+    - id: 19
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.48'
+      crop: [130, 70, 800, 700]
+
+    - id: 20
+      name: hallwayH
+      desc: Hallway H
+      class: oncam
+      ip: '192.168.1.49'
+      crop: [130, 70, 800, 700]
+
+    - id: 21
+      name: FirstFloorEnter 1 
+      desc: FirstFloorEnter 1
+      class: vivotek
+      ip: '192.168.1.26'
+      crop: [150, 150, 800, 650]
+
+    - id: 22
+      name: FirstFloorEnter 2 
+      desc: FirstFloorEnter 2
+      class: vivotek
+      ip: '192.168.1.27'
+      crop: [150, 150, 800, 650]
+
+    - id: 23
+      name: FirstFloorEnter 3 
+      desc: FirstFloorEnter 3
+      class: vivotek
+      ip: '192.168.1.28'
+      crop: [200, 200, 500, 500]
+
+    - id: 25
+      name: FirstLobby 1
+      desc: FirstLobby 1
+      class: vivotek
+      ip: '192.168.1.29'
+      crop: [300, 200, 500, 600]
+
+    - id: 24
+      name: FirstLobby 2
+      desc: FirstLobby 2
+      class: vivotek
+      ip: '192.168.1.30'
+      crop: [300, 150, 600, 650]
+
+    - id: 26
+      name: FirstLobby 3
+      desc: FirstLobby 3
+      class: vivotek
+      ip: '192.168.1.31'
+      crop: [300, 150, 600, 650]
+
+    - id: 27
+      name: FirstLobby 4
+      desc: FirstLobby 4
+      class: vivotek
+      ip: '192.168.1.32'
+      crop: [150, 200, 800, 650]
+
+    - id: 28
+      name: SandBoxHallWay 1
+      desc: SandBoxHallWay 1
+      class: oncam
+      ip: '192.168.1.33'
+      crop: [230, 150, 600, 650]
+
+    - id: 29
+      name: SandBoxHallWay 2
+      desc: SandBoxHallWay 2
+      class: oncam
+      ip: '192.168.1.34'
+      crop: [150, 150, 650, 650]
+      spawns:
+        - [240, 0, 240, 70]
+        - [550, 200, 100, 280]
+
+    - id: 30
+      name: SandBoxHallWay 3
+      desc: SandBoxHallWay 3
+      class: oncam
+      ip: '192.168.1.35'
+      crop: [250, 200, 600, 550]      
+
+    - id: 31
+      name: SandBoxHallWay 4
+      desc: SandBoxHallWay 4
+      class: oncam
+      ip: '192.168.1.36'
+      crop: [300, 200, 500, 550]
+
+    - id: 32
+      name: SandBoxHallWay 5
+      desc: SandBoxHallWay 5
+      class: oncam
+      ip: '192.168.1.37'
+      crop: [250, 200, 530, 500]
+
+    - id: 33
+      name: SandBoxHallWay 6
+      desc: SandBoxHallWay 6
+      class: oncam
+      ip: '192.168.1.38'
+      crop: [250, 200, 500, 550]
+
+    - id: 34
+      name: SandBoxHallWay 7
+      desc: SandBoxHallWay 7
+      class: oncam
+      ip: '192.168.1.39'
+      crop: [250, 200, 530, 550]
+
+    - id: 52
+      name: TLOS observation room
+      desc: TLOS observation room
+      class: TLOSoncam
+      ip: '192.168.1.50'
+      crop: [100, 200, 700, 650]
+      ang: -90
+

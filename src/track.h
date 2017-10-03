@@ -14,7 +14,10 @@ cv::Point calcCentroid(Contour& contour);
 
 class Track {
 public:
-    static const int costNonassignment = 40;
+    static const int costNonassignment = 300;
+    static const int costChangeAssignment = 200;
+    static const int ageChangeAssignment = 100;
+    static const int ageTrackDelete = 1000;
     // Will modify the contour vector - whatever remains was not assigned to a track
     static void assignTracks(Tracks& tracks, std::vector<Contour>& contours);
     static size_t getNextIndex();

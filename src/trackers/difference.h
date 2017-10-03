@@ -9,7 +9,7 @@ public:
     DifferenceTracker();
     ~DifferenceTracker();
 
-    void processFrame(cv::UMat& frame) override;
+    void processFrame(cv::UMat& frame, const Spawns& spawns) override;
 
 private:
     cv::Ptr<cv::BackgroundSubtractor> diffEngine;

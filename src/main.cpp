@@ -16,6 +16,9 @@
 #include "Networking/blobSender.h"
 #include <opencv2/calib3d.hpp>
 
+const double targetFPS = 30.0;
+const double targetSleep = 1000.0 / targetFPS;
+
 void sendTracks(int cameraId, cv::Size imgSize, ObjectTracker* tracker, blobSender& sender) {
     Blob blobData;
     memset(&blobData, 0, sizeof(blobData));
@@ -64,11 +67,23 @@ std::string parseURL(int camId, std::string arg) {
         Config& config = Config::get();
         if(config.isCameraDefined(camId)) {
             CameraInfo camInfo = config.getCameraInfo(camId);
+	    std::string url;
+	    if(camInfo.className=="TLOSoncam")
+	    {
+				CameraClass classInfo = config.getCameraClassInfo(camInfo.className);
+            	std::cout << "Using camera " << camId << " (" << camInfo.description << ")" << std::endl;
+            	url = "rtsp://";
+            	url += classInfo.username + ":" + classInfo.password + "@";
+           		url += arg + ":8555/" + classInfo.path;
+				std::cout<<url<<std::endl;
+	    }
+	    else{
             CameraClass classInfo = config.getCameraClassInfo(camInfo.className);
             std::cout << "Using camera " << camId << " (" << camInfo.description << ")" << std::endl;
-            std::string url("http://");
+            url = "http://";
             url += classInfo.username + ":" + classInfo.password + "@";
             url += arg + "/" + classInfo.path;
+	    }
             return url;
         } else {
             std::cout << "Using camera at address " << arg << std::endl;
@@ -105,27 +120,36 @@ int main(int argc, char *argv[]) {
         url = getURL(id);
     } else {
         id = std::atoi(argv[1]);
-        url = parseURL(id, argv[2]);
+        url = parseURL(id, argv[2]);	//argv[2]; //
     }
 
     // Initialize system objects
     Camera camera(id, url);
+    const Spawns& spawns = camera.getSpawns();
     Display display(id);
     ObjectTracker* tracker = new DifferenceTracker();
     blobSender sender(serverURL.c_str(), serverPort); // set up networking
+    bool paused = false;
 
     // Start video processing
     try {
         cv::UMat frame;
-        while(camera.getFrame(frame)) {
-            //cv::cvtColor(frame,frame,CV_BGR2HSV); // Convert to HSV to eliminate shadows
-            tracker->processFrame(frame);
-            display.showFrame(frame, tracker->getMaskImage(), tracker->getTracks());
-            sendTracks(id, {frame.cols, frame.rows}, tracker, sender);
+        while(true) {
+            if(!paused) {
+                if(!camera.getFrame(frame)) {
+                    break;
+                }
+                //cv::cvtColor(frame,frame,CV_BGR2HSV); // Convert to HSV to eliminate shadows
+                tracker->processFrame(frame, spawns);
+                sendTracks(id, {frame.cols, frame.rows}, tracker, sender);
+            }
+            display.showFrame(frame, tracker->getMaskImage(), tracker->getTracks(), spawns, paused);
             // Only the least-signficant byte is used, sometimes the rest is garbage so 0xFF is needed
-            int key = cv::waitKey(10) & 0xFF;
+            int key = cv::waitKey(targetSleep) & 0xFF;
             if(key == 27) { // Escape pressed
                 break;
+            } else if(key == ' ') {
+                paused = !paused;
             }
         }
     } catch(const std::exception& ex) {
